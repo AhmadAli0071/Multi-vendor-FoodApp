@@ -64,10 +64,11 @@ export const AppProvider = ({ children }) => {
     if (!useApi) setStats(computeStats(restaurants, orders));
   }, [restaurants, orders, useApi]);
 
-  // Try auto-login with stored token & fetch from API on mount
+  // Auto-login with admin credentials on mount
   useEffect(() => {
     const init = async () => {
-      if (getToken()) {
+      const savedToken = getToken();
+      if (savedToken) {
         try {
           const [statsRes, restRes, ordersRes] = await Promise.all([
             api.getStats(),
@@ -79,10 +80,18 @@ export const AppProvider = ({ children }) => {
           setOrders(ordersRes.orders.map(normalizeOrder));
           setUseApi(true);
           setIsAuthenticated(true);
-        } catch {
-          setIsAuthenticated(!!getToken());
-        }
+          setIsLoading(false);
+          return;
+        } catch { /* token expired, re-login below */ }
       }
+      // Auto-login with admin creds
+      try {
+        const data = await api.login('admin@foodapp.pk', 'admin123');
+        setToken(data.token);
+        setIsAuthenticated(true);
+        setUseApi(true);
+        await refreshAll();
+      } catch { /* offline - use localStorage fallback */ }
       setIsLoading(false);
     };
     init();
