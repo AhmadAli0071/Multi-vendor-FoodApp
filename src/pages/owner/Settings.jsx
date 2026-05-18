@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, Image, X, Lock, Power, PowerOff, Trash2 } from 'lucide-react';
+import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, X, Lock, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useOwner } from '../../context/OwnerContext';
 import { ownerApi } from '../../utils/ownerApi';
-import { API_BASE } from '../../utils/config';
 import toast from 'react-hot-toast';
 
 const OwnerSettings = () => {
@@ -47,61 +46,6 @@ const OwnerSettings = () => {
   };
 
   const [showBrandPreview, setShowBrandPreview] = useState(false);
-
-  // Payment Proof State
-  const [paymentAmount, setPaymentAmount] = useState('');
-  const [paymentImage, setPaymentImage] = useState(null);
-  const [paymentImageName, setPaymentImageName] = useState('');
-  const [uploading, setUploading] = useState(false);
-
-  const handleImageSelect = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be under 5MB');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPaymentImage(reader.result);
-      setPaymentImageName(file.name);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleUploadPayment = async () => {
-    if (!paymentAmount || Number(paymentAmount) <= 0) {
-      toast.error('Enter a valid amount');
-      return;
-    }
-    if (!paymentImage) {
-      toast.error('Select a screenshot');
-      return;
-    }
-    setUploading(true);
-    try {
-      const token = localStorage.getItem('admin_token') || localStorage.getItem('foodapp_customer_token') || '';
-      const res = await fetch(`${API_BASE}/payment-proofs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          amount: Number(paymentAmount),
-          image: paymentImage,
-          plan: restaurant.plan
-        })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message);
-      toast.success('Payment proof sent for approval!');
-      setPaymentAmount('');
-      setPaymentImage(null);
-      setPaymentImageName('');
-    } catch (err) {
-      toast.error(err.message || 'Upload failed');
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const primaryColor = form.primaryColor || '#FF6B35';
 
@@ -148,7 +92,7 @@ const OwnerSettings = () => {
               Copy
             </button>
           </div>
-          <p className="text-xs text-purple-400 mt-2">Share this ID with your customers for subscription payments</p>
+          <p className="text-xs text-purple-400 mt-2">Use this ID on the landing page to make subscription payments</p>
         </div>
       )}
 
@@ -324,52 +268,6 @@ const OwnerSettings = () => {
           className="w-full py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-medium flex items-center justify-center gap-2 active:bg-red-100"
         >
           <Trash2 size={14} /> Clear All Orders
-        </button>
-      </div>
-
-      {/* Payment Proof Upload */}
-      <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">
-        <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-          <Upload size={16} className="text-[#FF6B35]" /> Upload Payment Proof
-        </h2>
-        <p className="text-xs text-gray-400">Screenshot ke saath amount upload karein. Admin approve karne ke baad subscription renew ho jayegi.</p>
-
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Amount (PKR)</label>
-          <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)}
-            placeholder="Enter amount paid" min="1"
-            className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35]" />
-          {paymentAmount && (
-            <p className="text-xs text-gray-400 mt-1">
-              ~{Math.max(1, Math.floor(Number(paymentAmount) / ({ Starter: 2999, Business: 5999, Premium: 9999 }[restaurant.plan] || 5999)))} month(s)
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="text-xs text-gray-500 mb-1 block">Payment Screenshot</label>
-          <input type="file" accept="image/*" capture="environment" onChange={handleImageSelect}
-            className="hidden" id="payment-file" />
-          <label htmlFor="payment-file"
-            className="flex items-center justify-center gap-2 px-3 py-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#FF6B35] hover:bg-orange-50/50 transition-colors">
-            <Image size={20} className="text-gray-400" />
-            <span className="text-xs text-gray-500">{paymentImageName || 'Tap to upload screenshot'}</span>
-          </label>
-          {paymentImage && (
-            <div className="relative mt-2">
-              <img src={paymentImage} alt="Preview" className="w-full rounded-xl border max-h-48 object-cover" />
-              <button onClick={() => { setPaymentImage(null); setPaymentImageName(''); }}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full">
-                <X size={14} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        <button onClick={handleUploadPayment} disabled={uploading}
-          className="w-full py-2 bg-green-600 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-1.5 active:bg-green-700 disabled:opacity-50">
-          <Upload size={14} />
-          {uploading ? 'Uploading...' : 'Submit for Approval'}
         </button>
       </div>
 
