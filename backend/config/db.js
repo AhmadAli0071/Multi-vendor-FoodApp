@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/foodapp';
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error('MONGODB_URI is not set in environment variables');
+    }
     console.log('Connecting to MongoDB...');
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 30000,
