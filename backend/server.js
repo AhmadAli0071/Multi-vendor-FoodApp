@@ -96,16 +96,6 @@ app.use((req, res, next) => {
 // Static files for uploads (absolute path)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve frontend in production
-const distPath = path.resolve(__dirname, '..', 'dist');
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(distPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-  console.log(`📁 Serving static files from: ${distPath}`);
-}
-
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);
@@ -123,7 +113,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'FoodApp Backend Running', timestamp: new Date().toISOString() });
 });
 
-// 404 handler
+// Serve frontend in production (MUST be after API routes, before 404)
+const distPath = path.resolve(__dirname, '..', 'dist');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+  console.log(`📁 Serving static files from: ${distPath}`);
+}
+
+// 404 handler (for non-existent API routes in dev mode)
 app.use(notFound);
 
 // Error handler
