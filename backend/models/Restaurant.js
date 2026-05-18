@@ -48,7 +48,5 @@ const restaurantSchema = new mongoose.Schema({
   menu: menuSchema
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }, id: false });
 
-restaurantSchema.index({ slug: 1 });
-
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 export default Restaurant;
