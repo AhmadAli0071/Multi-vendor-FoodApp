@@ -97,11 +97,13 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve frontend in production
+const distPath = path.resolve(__dirname, '..', 'dist');
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('../dist'));
+  app.use(express.static(distPath));
   app.get('*', (req, res) => {
-    res.sendFile('../dist/index.html', { root: __dirname });
+    res.sendFile(path.join(distPath, 'index.html'));
   });
+  console.log(`📁 Serving static files from: ${distPath}`);
 }
 
 // Routes
