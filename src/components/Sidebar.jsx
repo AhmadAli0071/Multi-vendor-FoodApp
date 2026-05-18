@@ -21,6 +21,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { path: '/add-restaurant', icon: PlusCircle, label: 'Add Restaurant' },
     { path: '/orders', icon: ClipboardList, label: 'All Orders' },
     { path: '/subscriptions', icon: CreditCard, label: 'Subscriptions' },
+    { path: '/payment-settings', icon: CreditCard, label: 'Payment Settings' },
     { path: '/broadcast', icon: Megaphone, label: 'Broadcast' },
     { path: '/settings', icon: Settings, label: 'Settings' }
   ];

@@ -14,6 +14,7 @@ import AllOrders from './pages/AllOrders';
 import Subscriptions from './pages/Subscriptions';
 import Broadcast from './pages/Broadcast';
 import Settings from './pages/Settings';
+import PaymentSettingsPage from './pages/PaymentSettings';
 import RestaurantPage from './pages/customer/RestaurantPage';
 import CartPage from './pages/customer/CartPage';
 import CheckoutPage from './pages/customer/CheckoutPage';
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/broadcast" element={<Broadcast />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/payment-settings" element={<PaymentSettingsPage />} />
               </Routes>
             </Layout>
           } />
