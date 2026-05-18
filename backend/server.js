@@ -21,6 +21,7 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import corsOptions from './config/cors.js';
 import connectDB from './config/db.js';
 import { apiLimiter, authLimiter, uploadLimiter } from './middleware/rateLimit.js';
+import { ensureAdminUser } from './scripts/ensureAdmin.js';
 
 dotenv.config();
 
@@ -135,6 +136,7 @@ const PORT = process.env.PORT || 5000;
 // Only start server if not in test mode
 if (process.env.NODE_ENV !== 'test') {
   connectDB().then(async () => {
+    await ensureAdminUser();
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);

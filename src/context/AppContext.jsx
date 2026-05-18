@@ -71,8 +71,20 @@ export const AppProvider = ({ children }) => {
           setOrders(ordersRes.orders.map(normalizeOrder));
           setUseApi(true);
           setIsAuthenticated(true);
+          setIsLoading(false);
+          return;
         } catch { setToken(null); }
       }
+      try {
+        const data = await api.login(
+          import.meta.env.VITE_ADMIN_EMAIL,
+          import.meta.env.VITE_ADMIN_PASSWORD
+        );
+        setToken(data.token);
+        setIsAuthenticated(true);
+        setUseApi(true);
+        await refreshAll();
+      } catch { /* offline - no API */ }
       setIsLoading(false);
     };
     init();
