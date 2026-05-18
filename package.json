@@ -12,25 +12,23 @@
     "render-build": "npm install && npm --prefix backend install && npm run build",
     "install:all": "npm install && npm --prefix backend install"
   },
-  "devDependencies": {
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.5.0",
     "concurrently": "^8.2.2",
+    "lucide-react": "^1.14.0",
     "nodemon": "^3.1.14",
     "postcss": "^8.5.14",
-    "tailwindcss": "^4.2.4",
-    "vite": "^8.0.10"
-  },
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.2.4",
-    "lucide-react": "^1.14.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hot-toast": "^2.6.0",
-    "react-router-dom": "^7.15.0",
     "react-is": "^19.2.6",
+    "react-router-dom": "^7.15.0",
     "recharts": "^3.8.1",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "tailwindcss": "^4.2.4",
+    "vite": "^8.0.10"
   }
 }
