@@ -132,6 +132,7 @@ export const OwnerProvider = ({ children }) => {
       }
 
       const rest = restData.data;
+      if (restData.data?.payment_id) rest.payment_id = restData.data.payment_id;
       setRestaurant(rest);
       setIsLoggedIn(true);
       localStorage.setItem('owner_logged_in', 'true');

@@ -22,6 +22,7 @@ router.get('/me', protect, async (req, res, next) => {
       success: true,
       data: {
         ...restaurant,
+        payment_id: restaurant.payment_id,
         subscriptionStart: restaurant.subscription_start,
         subscriptionEnd: restaurant.subscription_end,
         createdAt: restaurant.created_at,

@@ -135,6 +135,23 @@ const OwnerSettings = () => {
         </button>
       </div>
 
+      {/* Payment ID */}
+      {restaurant.payment_id && (
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200 p-4">
+          <p className="text-xs text-purple-500 font-medium mb-1">Your Payment ID</p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-bold text-purple-700 tracking-widest font-mono">{restaurant.payment_id}</span>
+            <button
+              onClick={() => { navigator.clipboard.writeText(restaurant.payment_id); toast.success('Payment ID copied!'); }}
+              className="px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-200 transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <p className="text-xs text-purple-400 mt-2">Share this ID with your customers for subscription payments</p>
+        </div>
+      )}
+
       {/* Branding */}
       <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">
         <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
