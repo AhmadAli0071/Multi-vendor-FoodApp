@@ -98,6 +98,35 @@ export const seedDatabase = async () => {
       seeded = true;
     }
 
+    // Ensure admin user always exists with correct password from env
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@foodapp.pk';
+    const adminUser = await User.findOne({ email: adminEmail, role: 'admin' });
+
+    if (!adminUser) {
+      const hashedPwd = await import('bcryptjs').then(m => m.default.hash(adminPassword, 10));
+      await User.create({
+        id: 'ADMIN001',
+        email: adminEmail,
+        password: hashedPwd,
+        role: 'admin',
+        restaurant_id: null
+      });
+      console.log(`✅ Seeded admin: ${adminEmail}`);
+    } else {
+      // Update admin password to match env var (so admin can always login)
+      const bcryptjs = await import('bcryptjs');
+      const match = await bcryptjs.default.compare(adminPassword, adminUser.password);
+      if (!match) {
+        const hashedPwd = await bcryptjs.default.hash(adminPassword, 10);
+        await User.findOneAndUpdate(
+          { email: adminEmail, role: 'admin' },
+          { $set: { password: hashedPwd } }
+        );
+        console.log(`🔑 Admin password updated from env var`);
+      }
+    }
+
     if (seeded) {
       console.log('🎉 Database seeding completed!');
     } else {
