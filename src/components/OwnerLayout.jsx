@@ -1,0 +1,132 @@
+import React, { useEffect } from 'react';
+import { NavLink, useOutlet, Navigate } from 'react-router-dom';
+import {
+  LayoutDashboard, UtensilsCrossed, ClipboardList,
+  Settings, Power, PowerOff, LogOut, Store
+} from 'lucide-react';
+import { useOwner } from '../context/OwnerContext';
+import InstallPrompt from './InstallPrompt';
+import NewOrderPopup from './NewOrderPopup';
+import { updateManifest } from '../utils/manifest';
+import NotificationBell from './NotificationBell';
+
+const OwnerLayout = () => {
+  const { restaurant, isOpen, isLoggedIn, toggleOpen, logout, orders, pendingAlerts, dismissAlert } = useOwner();
+  const outlet = useOutlet();
+
+  const pendingCount = orders.filter(o => {
+    const isPending = o.status === 'pending' || o.status === 'Pending';
+    if (!isPending) return false;
+    const orderDate = new Date(o.createdAt || o.created_at);
+    const today = new Date();
+    return orderDate.toDateString() === today.toDateString();
+  }).length;
+
+  if (!isLoggedIn || !restaurant) {
+    return <Navigate to="/owner/login" replace />;
+  }
+
+  useEffect(() => {
+    if (restaurant) {
+      updateManifest({
+        name: restaurant.name,
+        shortName: restaurant.name
+      });
+    }
+  }, [restaurant]);
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const navItems = [
+    { to: '/owner', icon: LayoutDashboard, label: 'Home' },
+    { to: '/owner/menu', icon: UtensilsCrossed, label: 'Menu' },
+    { to: '/owner/orders', icon: ClipboardList, label: 'Orders' },
+    { to: '/owner/settings', icon: Settings, label: 'Settings' }
+  ];
+
+  const linkClasses = ({ isActive }) =>
+    `flex flex-col items-center justify-center py-1 px-2 transition-colors ${
+      isActive ? 'text-[#FF6B35]' : 'text-gray-400'
+    }`;
+
+  const primaryColor = restaurant.primary_color || restaurant.primaryColor || '#FF6B35';
+
+  return (
+    <div className="h-dvh flex flex-col bg-gray-100 max-w-lg mx-auto relative overflow-hidden shadow-2xl">
+      {/* Top Bar */}
+      <header
+        className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 text-white safe-top"
+        style={{ backgroundColor: primaryColor }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center text-lg overflow-hidden">
+            {restaurant.logo && (restaurant.logo.startsWith('data:image') || restaurant.logo.startsWith('http')) ? (
+              <img src={restaurant.logo} alt="Logo" className="w-full h-full object-cover" />
+            ) : (
+              restaurant.logo || '🍔'
+            )}
+          </div>
+          <div className="min-w-0">
+            <h1 className="font-bold text-sm leading-tight truncate max-w-[140px]">{restaurant.name}</h1>
+            <div className="flex items-center gap-1">
+              <span className={`inline-block w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-300' : 'bg-red-300'}`}></span>
+              <span className="text-[10px] opacity-80">{isOpen ? 'Open' : 'Closed'}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <NotificationBell pendingCount={pendingCount} />
+          <button
+            onClick={toggleOpen}
+            className={`p-2 rounded-lg transition-colors ${isOpen ? 'hover:bg-white/10' : 'bg-white/20 hover:bg-white/30'}`}
+            title={isOpen ? 'Close Store' : 'Open Store'}
+          >
+            {isOpen ? <Power size={18} /> : <PowerOff size={18} />}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-4 pb-24">
+          {outlet}
+        </div>
+      </main>
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-bottom max-w-lg mx-auto">
+        <div className="flex items-center justify-around h-16">
+          {navItems.map(item => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/owner'}
+              className={linkClasses}
+            >
+              <item.icon size={22} strokeWidth={1.8} />
+              <span className="text-[10px] font-medium mt-0.5">{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+
+      <InstallPrompt />
+
+      {/* New Order Popup Alerts */}
+      {pendingAlerts.map(alert => (
+        <NewOrderPopup key={alert.orderId} alert={alert} onDismiss={dismissAlert} />
+      ))}
+    </div>
+  );
+};
+
+export default OwnerLayout;

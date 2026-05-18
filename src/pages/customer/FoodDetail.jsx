@@ -1,0 +1,135 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useCustomer } from '../../context/CustomerContext';
+import { Minus, Plus, ShoppingCart, Clock, Star, Flame, ChevronLeft } from 'lucide-react';
+
+const FoodDetail = () => {
+  const { slug, itemId } = useParams();
+  const navigate = useNavigate();
+  const { restaurant, menu, addToCart } = useCustomer();
+
+  const allItems = menu.flatMap(m => m.items.map(item => ({ ...item, category: m.category, categoryIcon: m.category_icon })));
+  const item = allItems.find(i => i.id === itemId);
+
+  const [quantity, setQuantity] = useState(1);
+
+  if (!item) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 px-4">
+        <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-3">
+          <span className="text-3xl">🔍</span>
+        </div>
+        <p className="text-sm font-medium text-gray-500">Item not found</p>
+        <button onClick={() => navigate(`/r/${slug}`)} className="mt-4 px-6 py-2.5 bg-pink-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-pink-200">Back to Menu</button>
+      </div>
+    );
+  }
+
+  const primaryColor = restaurant?.primary_color || '#D81B60';
+
+  const handleAddToCart = () => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(slug, item);
+    }
+    navigate(`/r/${slug}`);
+  };
+
+  return (
+    <div className="flex flex-col min-h-full">
+      {/* Back Button Overlay */}
+      <button
+        onClick={() => navigate(-1)}
+        className="absolute top-4 left-4 z-20 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center"
+      >
+        <ChevronLeft size={18} className="text-gray-700" />
+      </button>
+
+      {/* Hero Image */}
+      <div className="h-72 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: primaryColor }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 right-10 w-40 h-40 rounded-full bg-white" />
+          <div className="absolute bottom-0 left-5 w-32 h-32 rounded-full bg-white" />
+        </div>
+        <span className="text-[100px] relative z-10 drop-shadow-xl">{item.image || '🍽️'}</span>
+        {item.popular && (
+          <div className="absolute top-4 right-4 bg-white text-pink-500 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-lg z-10">
+            <Flame size={12} /> Popular
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 px-5 pt-6 pb-24 space-y-5 -mt-6 bg-white rounded-t-3xl relative">
+        {/* Title & Price */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[11px] bg-pink-50 text-pink-500 px-2.5 py-1 rounded-full font-semibold">{item.categoryIcon || '🍽️'} {item.category}</span>
+            {item.prepTime && (
+              <span className="text-[11px] bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+                <Clock size={11} /> {item.prepTime}
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl font-extrabold text-gray-800 mt-1">{item.name}</h1>
+          <div className="flex items-center gap-2 mt-2">
+            <p className="text-2xl font-extrabold" style={{ color: primaryColor }}>Rs. {item.price}</p>
+            <span className="text-xs text-gray-400">per serving</span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-gray-100" />
+
+        {/* Description */}
+        <div>
+          <h3 className="text-sm font-bold text-gray-700 mb-2">Description</h3>
+          <p className="text-sm text-gray-500 leading-relaxed">{item.description || 'Freshly prepared with quality ingredients. Our chefs take pride in every dish we serve.'}</p>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-gray-100" />
+
+        {/* Quantity Selector */}
+        <div>
+          <h3 className="text-sm font-bold text-gray-700 mb-3">Quantity</h3>
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => setQuantity(q => Math.max(1, q - 1))}
+              className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center hover:border-pink-300 active:scale-95 transition-all"
+            >
+              <Minus size={18} className="text-gray-500" />
+            </button>
+            <span className="text-xl font-bold text-gray-800 w-8 text-center">{quantity}</span>
+            <button
+              onClick={() => setQuantity(q => q + 1)}
+              className="w-10 h-10 rounded-xl text-white flex items-center justify-center active:scale-95 transition-all shadow-md"
+              style={{ backgroundColor: primaryColor }}
+            >
+              <Plus size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-lg mx-auto safe-bottom">
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <p className="text-[11px] text-gray-400">{quantity} item{quantity > 1 ? 's' : ''}</p>
+            <p className="text-lg font-extrabold" style={{ color: primaryColor }}>Rs. {item.price * quantity}</p>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all"
+            style={{ backgroundColor: primaryColor }}
+          >
+            <ShoppingCart size={18} />
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FoodDetail;
