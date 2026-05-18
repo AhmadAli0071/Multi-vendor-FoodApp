@@ -71,8 +71,27 @@ export const AppProvider = ({ children }) => {
           setOrders(ordersRes.orders.map(normalizeOrder));
           setUseApi(true);
           setIsAuthenticated(true);
+          setIsLoading(false);
+          return;
         } catch { setToken(null); }
       }
+      try {
+        const res = await fetch(`${API_BASE}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: import.meta.env.VITE_ADMIN_EMAIL || 'admin@foodapp.pk',
+            password: import.meta.env.VITE_ADMIN_PASSWORD || 'admin123'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setToken(data.token);
+          setIsAuthenticated(true);
+          setUseApi(true);
+          await refreshAll();
+        }
+      } catch { /* offline */ }
       setIsLoading(false);
     };
     init();
