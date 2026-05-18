@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Eye, Pencil, QrCode, Power, Trash2, X, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
+import { APP_URL } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const RestaurantCard = ({ restaurant }) => {
@@ -48,7 +49,7 @@ const RestaurantCard = ({ restaurant }) => {
   const todayOrders = getTodayOrdersCount();
 
   // Generate customer app URL
-  const customerUrl = `http://localhost:5173/r/${restaurant.slug}`;
+  const customerUrl = `${APP_URL}/r/${restaurant.slug}`;
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
