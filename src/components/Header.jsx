@@ -34,7 +34,6 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_passcode');
     localStorage.removeItem('admin_token');
     window.location.reload();
   };

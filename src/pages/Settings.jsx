@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Globe, DollarSign, Clock, Bell, Smartphone, AlertTriangle, Save, Trash2, Power, PowerOff } from 'lucide-react';
+import { User, Mail, Lock, Globe, DollarSign, Clock, Bell, Smartphone, AlertTriangle, Save, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 const Settings = () => {
-  const { restaurants, orders, updateRestaurant } = useAppContext();
+  const { orders } = useAppContext();
 
   const [adminProfile, setAdminProfile] = useState({
     name: 'Super Admin',
@@ -27,14 +27,6 @@ const Settings = () => {
   });
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [dashboardLocked, setDashboardLocked] = useState(localStorage.getItem('admin_locked') === 'true');
-
-  const handleToggleLock = () => {
-    const next = !dashboardLocked;
-    setDashboardLocked(next);
-    localStorage.setItem('admin_locked', next ? 'true' : 'false');
-    toast.success(next ? 'Dashboard locked' : 'Dashboard unlocked');
-  };
 
   const handleClearOrders = () => {
     if (window.confirm(`Delete ALL ${orders.length} orders permanently?`)) {
@@ -322,13 +314,6 @@ const Settings = () => {
             <h2 className="text-lg font-bold text-gray-800">Actions</h2>
           </div>
           <div className="space-y-3">
-            <button onClick={handleToggleLock}
-              className={`w-full py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 ${
-                dashboardLocked ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'
-              }`}>
-              {dashboardLocked ? <PowerOff size={16} /> : <Power size={16} />}
-              {dashboardLocked ? 'Unlock Dashboard' : 'Lock Dashboard'}
-            </button>
             <button onClick={handleClearOrders}
               className="w-full py-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-red-100">
               <Trash2 size={16} /> Clear All Orders ({orders.length})

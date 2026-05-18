@@ -38,10 +38,6 @@ export const uploadImage = async (file) => {
 };
 
 export const api = {
-  // Auth
-  login: (email, password) =>
-    apiCall('/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
-
   // Dashboard
   getStats: () => apiCall('/admin/dashboard-stats'),
 

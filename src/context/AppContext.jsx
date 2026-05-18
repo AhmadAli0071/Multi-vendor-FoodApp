@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, setToken, getToken } from '../utils/api';
-
+import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const AppContext = createContext();
@@ -71,20 +71,8 @@ export const AppProvider = ({ children }) => {
           setOrders(ordersRes.orders.map(normalizeOrder));
           setUseApi(true);
           setIsAuthenticated(true);
-          setIsLoading(false);
-          return;
         } catch { setToken(null); }
       }
-      try {
-        const data = await api.login(
-          import.meta.env.VITE_ADMIN_EMAIL,
-          import.meta.env.VITE_ADMIN_PASSWORD
-        );
-        setToken(data.token);
-        setIsAuthenticated(true);
-        setUseApi(true);
-        await refreshAll();
-      } catch { /* offline - no API */ }
       setIsLoading(false);
     };
     init();
@@ -115,7 +103,13 @@ export const AppProvider = ({ children }) => {
 
   // Login
   const login = async (email, password) => {
-    const data = await api.login(email, password);
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
     setToken(data.token);
     setIsAuthenticated(true);
     setUseApi(true);
