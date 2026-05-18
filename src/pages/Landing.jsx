@@ -30,6 +30,7 @@ const Landing = () => {
     try {
       const res = await fetch(`${API_BASE}/payment-proofs/lookup/${paymentId.trim().toUpperCase()}`);
       const data = await res.json();
+      console.log('Lookup response:', data);
       if (!data.success) {
         setError(data.message || 'Restaurant not found');
         return;
@@ -37,7 +38,8 @@ const Landing = () => {
       setRestaurant(data.restaurant);
       setPaymentMethods(data.payment_methods);
       setAmount(data.restaurant.amount_due.toString());
-    } catch {
+    } catch (err) {
+      console.error('Lookup error:', err);
       setError('Unable to fetch. Please check your Payment ID.');
     } finally {
       setLoading(false);
@@ -156,10 +158,10 @@ const Landing = () => {
 
       {/* Error */}
       {error && (
-        <div className="max-w-lg mx-auto px-4 -mt-6 mb-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-            <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
+        <div className="max-w-lg mx-auto px-4 mt-8 mb-8">
+          <div className="bg-red-50 border-2 border-red-300 rounded-xl p-5 text-center">
+            <AlertCircle size={28} className="text-red-500 mx-auto mb-2" />
+            <p className="text-red-700 font-semibold">{error}</p>
           </div>
         </div>
       )}
