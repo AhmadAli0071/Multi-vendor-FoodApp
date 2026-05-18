@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, setToken, getToken } from '../utils/api';
-import restaurantsData from '../data/restaurants.json';
-import ordersData from '../data/orders.json';
+
 import toast from 'react-hot-toast';
 
 const AppContext = createContext();
@@ -10,13 +9,6 @@ export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppContext must be used within AppProvider');
   return context;
-};
-
-const loadLocal = (key, fallback) => {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : fallback;
-  } catch { return fallback; }
 };
 
 const computeStats = (rests, ords) => {
@@ -51,9 +43,9 @@ export const AppProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getToken());
   const [useApi, setUseApi] = useState(false);
 
-  const [restaurants, setRestaurants] = useState(() => loadLocal('foodapp_restaurants', restaurantsData));
-  const [orders, setOrders] = useState(() => loadLocal('foodapp_orders', ordersData));
-  const [stats, setStats] = useState(() => computeStats(loadLocal('foodapp_restaurants', restaurantsData), loadLocal('foodapp_orders', ordersData)));
+  const [restaurants, setRestaurants] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [stats, setStats] = useState({ totalRestaurants: 0, activeOrders: 0, todayOrders: 0, monthlyRevenue: 0 });
 
   // Persist to localStorage
   useEffect(() => { localStorage.setItem('foodapp_restaurants', JSON.stringify(restaurants)); }, [restaurants]);
@@ -64,7 +56,6 @@ export const AppProvider = ({ children }) => {
     if (!useApi) setStats(computeStats(restaurants, orders));
   }, [restaurants, orders, useApi]);
 
-  // Auto-login with admin credentials on mount
   useEffect(() => {
     const init = async () => {
       const savedToken = getToken();
@@ -80,18 +71,8 @@ export const AppProvider = ({ children }) => {
           setOrders(ordersRes.orders.map(normalizeOrder));
           setUseApi(true);
           setIsAuthenticated(true);
-          setIsLoading(false);
-          return;
-        } catch { /* token expired, re-login below */ }
+        } catch { setToken(null); }
       }
-      // Auto-login with admin creds
-      try {
-        const data = await api.login('admin@foodapp.pk', 'admin123');
-        setToken(data.token);
-        setIsAuthenticated(true);
-        setUseApi(true);
-        await refreshAll();
-      } catch { /* offline - use localStorage fallback */ }
       setIsLoading(false);
     };
     init();
@@ -134,8 +115,11 @@ export const AppProvider = ({ children }) => {
     setToken(null);
     setIsAuthenticated(false);
     setUseApi(false);
-    setRestaurants(restaurantsData);
-    setOrders(ordersData);
+    setRestaurants([]);
+    setOrders([]);
+    setStats({ totalRestaurants: 0, activeOrders: 0, todayOrders: 0, monthlyRevenue: 0 });
+    localStorage.removeItem('foodapp_restaurants');
+    localStorage.removeItem('foodapp_orders');
   };
 
   const refreshAll = async () => {
