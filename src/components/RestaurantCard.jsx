@@ -72,6 +72,11 @@ const RestaurantCard = ({ restaurant }) => {
           <div>
             <h3 className="font-bold text-gray-900">{restaurant.name}</h3>
             <p className="text-sm text-gray-500">{restaurant.email}</p>
+            {restaurant.paymentId && (
+              <span className="inline-block mt-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-mono font-bold tracking-wider">
+                {restaurant.paymentId}
+              </span>
+            )}
           </div>
         </div>
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>

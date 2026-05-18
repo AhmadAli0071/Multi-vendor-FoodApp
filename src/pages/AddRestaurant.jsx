@@ -522,6 +522,12 @@ const AddRestaurant = () => {
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Restaurant Added!</h2>
               <p className="text-4xl font-bold text-[#FF6B35] mb-1">{newRestaurant.name}</p>
+              {newRestaurant.paymentId && (
+                <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-xl px-4 py-2 mt-2">
+                  <span className="text-xs text-purple-500 font-medium">Payment ID</span>
+                  <span className="text-lg font-bold text-purple-700 tracking-widest font-mono">{newRestaurant.paymentId}</span>
+                </div>
+              )}
             </div>
 
             {/* Customer URL */}

@@ -128,7 +128,7 @@ router.post('/', protect, adminOnly, async (req, res, next) => {
     const planPrices = { Starter: 2999, Business: 5999, Premium: 9999 };
     await db.createPayment({ id: 'PAY_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6), restaurant_id: restaurantId, plan, amount: planPrices[plan], payment_method: 'Cash', status: 'completed', payment_date: subscriptionStart });
 
-    res.status(201).json({ success: true, message: 'Restaurant created successfully', restaurant: { id: restaurantId, name, email, slug, plan, active: true } });
+    res.status(201).json({ success: true, message: 'Restaurant created successfully', restaurant: { id: restaurantId, name, email, slug, plan, active: true, payment_id: paymentId } });
   } catch (error) {
     if (error.message?.includes('duplicate') || error.message?.includes('already exists')) {
       return res.status(400).json({ success: false, message: 'Email or slug already exists' });

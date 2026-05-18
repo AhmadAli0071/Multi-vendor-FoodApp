@@ -98,7 +98,8 @@ export const AppProvider = ({ children }) => {
     plan: r.plan, subscriptionStart: r.subscription_start || r.subscriptionStart || '',
     subscriptionEnd: r.subscription_end || r.subscriptionEnd || '',
     active: r.active !== false, createdAt: r.created_at || r.createdAt || '',
-    todayOrders: r.todayOrders || 0
+    todayOrders: r.todayOrders || 0,
+    paymentId: r.payment_id || ''
   });
 
   const normalizeOrder = (o) => ({
@@ -157,7 +158,8 @@ export const AppProvider = ({ children }) => {
       try {
         const data = await api.createRestaurant(payload);
         await refreshAll();
-        return restaurants.find(r => r.slug === restaurant.slug) || { id: data.restaurant.id, slug: restaurant.slug, ...restaurant };
+        const created = { id: data.restaurant.id, slug: restaurant.slug, paymentId: data.restaurant.payment_id, ...restaurant };
+        return created;
       } catch (err) {
         toast.error(err.message);
       }
