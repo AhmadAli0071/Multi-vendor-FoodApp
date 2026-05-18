@@ -49,6 +49,21 @@ export const OwnerProvider = ({ children }) => {
     };
   }, []);
 
+  // Refresh restaurant data on mount (ensures payment_id etc. are up to date)
+  useEffect(() => {
+    if (!isLoggedIn || !restaurant?.id) return;
+    const token = localStorage.getItem('owner_token');
+    if (!token) return;
+    fetch(`${API_BASE}/restaurants/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).then(r => r.json()).then(d => {
+      if (d.success && d.data) {
+        setRestaurant(d.data);
+        localStorage.setItem('owner_restaurant', JSON.stringify(d.data));
+      }
+    }).catch(() => {});
+  }, [isLoggedIn]);
+
   // Connect socket when logged in (handles page refresh / already logged in)
   useEffect(() => {
     if (!isLoggedIn || !restaurant) return;
