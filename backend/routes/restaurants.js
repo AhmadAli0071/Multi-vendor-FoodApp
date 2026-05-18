@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import { db } from '../config/database.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import { generatePaymentId } from '../utils/paymentId.js';
 
 const router = express.Router();
 
@@ -120,7 +121,8 @@ router.post('/', protect, adminOnly, async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await db.createRestaurant({ id: restaurantId, name, email, password: hashedPassword, phone, whatsapp, address, primary_color: primaryColor, secondary_color: secondaryColor, font_family: fontFamily, logo: logo || null, slug, delivery_available: deliveryAvailable, pickup_available: pickupAvailable, plan, subscription_start: subscriptionStart, subscription_end: subscriptionEnd, active: true });
+    const paymentId = await generatePaymentId();
+    await db.createRestaurant({ id: restaurantId, name, email, password: hashedPassword, phone, whatsapp, address, primary_color: primaryColor, secondary_color: secondaryColor, font_family: fontFamily, logo: logo || null, slug, delivery_available: deliveryAvailable, pickup_available: pickupAvailable, plan, subscription_start: subscriptionStart, subscription_end: subscriptionEnd, active: true, payment_id: paymentId });
     await db.createUser({ id: 'USER_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6), email, password: hashedPassword, role: 'restaurant', restaurant_id: restaurantId });
 
     const planPrices = { Starter: 2999, Business: 5999, Premium: 9999 };

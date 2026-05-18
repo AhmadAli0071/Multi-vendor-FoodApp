@@ -27,6 +27,7 @@ import MenuManagement from './pages/owner/MenuManagement';
 import OwnerOrders from './pages/owner/Orders';
 import OwnerSettings from './pages/owner/Settings';
 import OwnerLogin from './pages/owner/Login';
+import Landing from './pages/Landing';
 
 function App() {
   return (
@@ -51,6 +52,9 @@ function App() {
             <Route path="orders" element={<OwnerOrders />} />
             <Route path="settings" element={<OwnerSettings />} />
           </Route>
+
+          {/* Landing Page (Public) */}
+          <Route path="/landing" element={<Landing />} />
 
           {/* Admin Routes (Sidebar layout) */}
           <Route path="/*" element={

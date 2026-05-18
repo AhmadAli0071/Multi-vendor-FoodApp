@@ -7,6 +7,86 @@ const router = express.Router();
 
 const planPrices = { Starter: 2999, Business: 5999, Premium: 9999 };
 
+// PUBLIC: GET /api/payment-proofs/lookup/:paymentId - Search restaurant by payment ID
+router.get('/lookup/:paymentId', async (req, res) => {
+  try {
+    const restaurant = await db.findRestaurantByPaymentId(req.params.paymentId.toUpperCase());
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: 'Invalid Payment ID. Restaurant not found.' });
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const endDate = restaurant.subscription_end || '';
+    const isExpired = endDate < today;
+    const daysLeft = endDate ? Math.ceil((new Date(endDate) - new Date()) / 86400000) : 0;
+    const planPrice = planPrices[restaurant.plan] || 5999;
+
+    const paymentSettings = await db.getPaymentSettings();
+
+    res.json({
+      success: true,
+      restaurant: {
+        id: restaurant.id,
+        name: restaurant.name,
+        payment_id: restaurant.payment_id,
+        plan: restaurant.plan,
+        subscription_end: endDate,
+        is_expired: isExpired,
+        days_left: Math.max(0, daysLeft),
+        active: restaurant.active,
+        amount_due: planPrice
+      },
+      payment_methods: {
+        jazzcash: paymentSettings.jazzcash_number || '',
+        jazzcash_name: paymentSettings.jazzcash_name || 'JazzCash',
+        easypaisa: paymentSettings.easypaisa_number || '',
+        easypaisa_name: paymentSettings.easypaisa_name || 'EasyPaisa',
+        bank_account: paymentSettings.bank_account || '',
+        bank_name: paymentSettings.bank_name || ''
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PUBLIC: POST /api/payment-proofs/public - Upload payment proof (no auth)
+router.post('/public', async (req, res) => {
+  try {
+    const { payment_id, amount, plan, payment_method, image } = req.body;
+    if (!payment_id || !amount || !image) {
+      return res.status(400).json({ success: false, message: 'Payment ID, amount, and screenshot are required' });
+    }
+
+    const restaurant = await db.findRestaurantByPaymentId(payment_id.toUpperCase());
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: 'Restaurant not found' });
+    }
+
+    const price = planPrices[plan || restaurant.plan] || 5999;
+    const monthsToAdd = Math.max(1, Math.floor(parseFloat(amount) / price));
+
+    await PaymentProof.create({
+      restaurant_id: restaurant.id,
+      restaurant_name: restaurant.name,
+      payment_id: payment_id.toUpperCase(),
+      amount: parseFloat(amount),
+      plan: plan || restaurant.plan,
+      payment_method: payment_method || '',
+      image,
+      status: 'pending',
+      months_to_add: monthsToAdd
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Payment proof submitted! Admin will verify and update your subscription.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // POST /api/payment-proofs - Restaurant owner uploads payment proof
 router.post('/', protect, async (req, res, next) => {
   try {

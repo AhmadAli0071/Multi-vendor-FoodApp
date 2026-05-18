@@ -13,6 +13,7 @@ import adminRoutes from './routes/admin.js';
 import authRoutes from './routes/auth.js';
 import customerRoutes from './routes/customer.js';
 import paymentProofRoutes from './routes/paymentProofs.js';
+import paymentSettingsRoutes from './routes/paymentSettings.js';
 import uploadRoutes from './routes/upload.js';
 import menuRoutes from './routes/menu.js';
 import { db } from './config/database.js';
@@ -105,6 +106,7 @@ app.use('/api/subscriptions', apiLimiter, subscriptionRoutes);
 app.use('/api/broadcast', apiLimiter, broadcastRoutes);
 app.use('/api/customer', apiLimiter, customerRoutes);
 app.use('/api/payment-proofs', apiLimiter, paymentProofRoutes);
+app.use('/api/payment-settings', apiLimiter, paymentSettingsRoutes);
 app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/menu', apiLimiter, menuRoutes);
 

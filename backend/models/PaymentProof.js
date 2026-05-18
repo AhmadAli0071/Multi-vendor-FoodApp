@@ -3,9 +3,11 @@ import mongoose from 'mongoose';
 const paymentProofSchema = new mongoose.Schema({
   restaurant_id: { type: String, required: true },
   restaurant_name: { type: String },
+  payment_id: { type: String },
   amount: { type: Number, required: true },
   plan: { type: String },
   image: { type: String },
+  payment_method: { type: String, default: '' },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   admin_note: { type: String, default: '' },
   months_to_add: { type: Number, default: 1 }

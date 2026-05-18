@@ -6,6 +6,7 @@ import Broadcast from '../models/Broadcast.js';
 import Notification from '../models/Notification.js';
 import MenuItem from '../models/MenuItem.js';
 import Customer from '../models/Customer.js';
+import PaymentSettings from '../models/PaymentSettings.js';
 
 class Database {
   // RESTAURANTS
@@ -226,6 +227,24 @@ class Database {
 
   async deleteMenuItem(id) {
     return MenuItem.findOneAndDelete({ id });
+  }
+
+  // PAYMENT SETTINGS
+  async getPaymentSettings() {
+    let settings = await PaymentSettings.findOne();
+    if (!settings) {
+      settings = await PaymentSettings.create({});
+    }
+    return settings;
+  }
+
+  async updatePaymentSettings(data) {
+    return PaymentSettings.findOneAndUpdate({}, { $set: data }, { new: true, upsert: true });
+  }
+
+  // Find restaurant by payment_id
+  async findRestaurantByPaymentId(paymentId) {
+    return Restaurant.findOne({ payment_id: paymentId }).lean();
   }
 
   // CUSTOMERS

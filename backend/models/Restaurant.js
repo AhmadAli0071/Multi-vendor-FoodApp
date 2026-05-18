@@ -45,6 +45,7 @@ const restaurantSchema = new mongoose.Schema({
   subscription_start: { type: String },
   subscription_end: { type: String },
   active: { type: Boolean, default: true },
+  payment_id: { type: String, unique: true, sparse: true },
   menu: menuSchema
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }, id: false });
 

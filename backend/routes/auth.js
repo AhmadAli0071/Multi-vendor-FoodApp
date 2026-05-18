@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../config/database.js';
 import { protect } from '../middleware/auth.js';
+import { generatePaymentId } from '../utils/paymentId.js';
 
 const router = express.Router();
 
@@ -39,7 +40,8 @@ router.post('/register', async (req, res, next) => {
     const startDate = new Date().toISOString().split('T')[0];
     const endDate = new Date(); endDate.setMonth(endDate.getMonth() + 1); const endDateStr = endDate.toISOString().split('T')[0];
 
-    await db.createRestaurant({ id: restaurantId, name, email, password: hashedPassword, phone, whatsapp, address, primary_color: '#FF6B35', secondary_color: '#FFFFFF', font_family: 'Poppins', slug, delivery_available: true, pickup_available: true, plan, subscription_start: startDate, subscription_end: endDateStr, active: true });
+    const paymentId = await generatePaymentId();
+    await db.createRestaurant({ id: restaurantId, name, email, password: hashedPassword, phone, whatsapp, address, primary_color: '#FF6B35', secondary_color: '#FFFFFF', font_family: 'Poppins', slug, delivery_available: true, pickup_available: true, plan, subscription_start: startDate, subscription_end: endDateStr, active: true, payment_id: paymentId });
     await db.createUser({ id: userId, email, password: hashedPassword, role: 'restaurant', restaurant_id: restaurantId });
     const planPrices = { Starter: 2999, Business: 5999, Premium: 9999 };
     await db.createPayment({ id: 'PAY_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6), restaurant_id: restaurantId, plan, amount: planPrices[plan], payment_method: 'Cash', status: 'completed', payment_date: startDate });
