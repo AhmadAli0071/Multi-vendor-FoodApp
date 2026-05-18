@@ -138,7 +138,6 @@ if (process.env.NODE_ENV !== 'test') {
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`🔗 API: http://localhost:${PORT}/api`);
       console.log(`🔌 Socket.io ready`);
     });
   });
