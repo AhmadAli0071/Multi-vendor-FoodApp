@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Calendar, DollarSign, RefreshCw, ArrowUpRight, X, CheckCircle, Ban, Image } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 
-const API = 'http://localhost:5000/api';
+const API = API_BASE;
 
 const Subscriptions = () => {
   const { restaurants, renewSubscription, updateRestaurant } = useAppContext();

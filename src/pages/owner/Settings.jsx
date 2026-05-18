@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, Image, X, Lock, Power, PowerOff, Trash2 } from 'lucide-react';
 import { useOwner } from '../../context/OwnerContext';
 import { ownerApi } from '../../utils/ownerApi';
+import { API_BASE } from '../../utils/config';
 import toast from 'react-hot-toast';
 
 const OwnerSettings = () => {
@@ -80,7 +81,7 @@ const OwnerSettings = () => {
     setUploading(true);
     try {
       const token = localStorage.getItem('admin_token') || localStorage.getItem('foodapp_customer_token') || '';
-      const res = await fetch('http://localhost:5000/api/payment-proofs', {
+      const res = await fetch(`${API_BASE}/payment-proofs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
