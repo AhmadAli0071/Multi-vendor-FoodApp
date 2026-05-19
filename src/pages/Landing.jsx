@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, CreditCard, Upload, CheckCircle, AlertCircle, Clock, Copy, ExternalLink, Utensils, Shield, Zap, Star } from 'lucide-react';
 import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
@@ -17,10 +17,15 @@ const Landing = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  useEffect(() => {
+    console.log('Landing page mounted - ready for lookup');
+  }, []);
+
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!paymentId.trim()) return;
 
+    toast.success(`Looking up: ${paymentId.trim().toUpperCase()}`);
     setLoading(true);
     setError('');
     setRestaurant(null);
@@ -33,14 +38,17 @@ const Landing = () => {
       console.log('Lookup response:', data);
       if (!data.success) {
         setError(data.message || 'Restaurant not found');
+        toast.error(data.message || 'Restaurant not found');
         return;
       }
       setRestaurant(data.restaurant);
       setPaymentMethods(data.payment_methods);
       setAmount(data.restaurant.amount_due.toString());
+      toast.success(`Found: ${data.restaurant.name}`);
     } catch (err) {
       console.error('Lookup error:', err);
       setError('Unable to fetch. Please check your Payment ID.');
+      toast.error('Server nahi chal raha ya Payment ID galat hai');
     } finally {
       setLoading(false);
     }
