@@ -12,7 +12,6 @@ const Landing = () => {
 
   const [selectedMethod, setSelectedMethod] = useState('');
   const [amount, setAmount] = useState('');
-  const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -64,7 +63,7 @@ const Landing = () => {
       toast.error('Image must be under 5MB');
       return;
     }
-    setImage(file);
+    setImagePreview(null);
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
     reader.readAsDataURL(file);
@@ -72,28 +71,19 @@ const Landing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image || !amount || !selectedMethod) {
+    if (!imagePreview || !amount || !selectedMethod) {
       toast.error('Please fill all fields and upload screenshot');
       return;
     }
 
     setSubmitting(true);
     try {
-      const uploadForm = new FormData();
-      uploadForm.append('image', image);
-      const uploadRes = await fetch(`${API_BASE}/upload`, {
-        method: 'POST',
-        body: uploadForm
-      });
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error(uploadData.message || 'Upload failed');
-
       const body = {
         payment_id: paymentId.trim().toUpperCase(),
         amount: parseFloat(amount),
         plan: restaurant.plan,
         payment_method: selectedMethod,
-        image: uploadData.data.url
+        image: imagePreview
       };
 
       const res = await fetch(`${API_BASE}/payment-proofs/public`, {
@@ -296,7 +286,7 @@ const Landing = () => {
 
               <button
                 type="submit"
-                disabled={submitting || !selectedMethod || !image}
+                disabled={submitting || !selectedMethod || !imagePreview}
                 className="w-full py-3.5 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {submitting ? (
@@ -323,7 +313,7 @@ const Landing = () => {
               Your payment proof has been sent to the admin. Your subscription will be updated after verification.
             </p>
             <button
-              onClick={() => { setSubmitted(false); setRestaurant(null); setPaymentId(''); setSelectedMethod(''); setImage(null); setImagePreview(null); }}
+              onClick={() => { setSubmitted(false); setRestaurant(null); setPaymentId(''); setSelectedMethod(''); setImagePreview(null); }}
               className="text-[#FF6B35] font-semibold text-sm hover:underline"
             >
               Check Another Payment ID
