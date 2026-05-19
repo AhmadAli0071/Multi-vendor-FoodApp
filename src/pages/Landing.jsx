@@ -21,8 +21,7 @@ const Landing = () => {
     console.log('Landing page mounted - ready for lookup');
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const handleSearch = async () => {
     if (!paymentId.trim()) return;
 
     toast.success(`Looking up: ${paymentId.trim().toUpperCase()}`);
@@ -134,7 +133,7 @@ const Landing = () => {
             </p>
 
             {/* Search */}
-            <form onSubmit={handleSearch} className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto">
               <div className="flex gap-2">
                 <div className="flex-1 relative">
                   <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -143,12 +142,13 @@ const Landing = () => {
                     placeholder="Enter Payment ID (e.g. A1234)"
                     value={paymentId}
                     onChange={(e) => setPaymentId(e.target.value.toUpperCase())}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     className="w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 focus:border-[#FF6B35] focus:ring-2 focus:ring-orange-100 outline-none text-gray-800 font-medium text-lg tracking-widest placeholder:tracking-normal placeholder:font-normal placeholder:text-sm"
                     maxLength={5}
                   />
                 </div>
                 <button
-                  type="submit"
+                  onClick={handleSearch}
                   disabled={loading || !paymentId.trim()}
                   className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
                 >
@@ -159,7 +159,7 @@ const Landing = () => {
                   )}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </header>
