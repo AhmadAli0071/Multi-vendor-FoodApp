@@ -22,9 +22,13 @@ const Landing = () => {
   }, []);
 
   const handleSearch = async () => {
-    if (!paymentId.trim()) return;
+    if (!paymentId.trim()) {
+      toast.error('Please enter a Payment ID');
+      return;
+    }
 
-    toast.success(`Looking up: ${paymentId.trim().toUpperCase()}`);
+    console.log('Search clicked, paymentId:', paymentId);
+    toast.success('Looking up: ' + paymentId.trim().toUpperCase());
     setLoading(true);
     setError('');
     setRestaurant(null);
@@ -43,11 +47,11 @@ const Landing = () => {
       setRestaurant(data.restaurant);
       setPaymentMethods(data.payment_methods);
       setAmount(data.restaurant.amount_due.toString());
-      toast.success(`Found: ${data.restaurant.name}`);
+      toast.success('Found: ' + data.restaurant.name);
     } catch (err) {
       console.error('Lookup error:', err);
-      setError('Unable to fetch. Please check your Payment ID.');
-      toast.error('Server nahi chal raha ya Payment ID galat hai');
+      setError('Unable to fetch. Server may be offline.');
+      toast.error('Server nahi chal raha');
     } finally {
       setLoading(false);
     }
@@ -149,8 +153,7 @@ const Landing = () => {
                 </div>
                 <button
                   onClick={handleSearch}
-                  disabled={loading || !paymentId.trim()}
-                  className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-3.5 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold rounded-xl transition-all flex items-center gap-2"
                 >
                   {loading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
