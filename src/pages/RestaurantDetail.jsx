@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Store, Phone, MapPin, Calendar, CreditCard, Edit2, Save, X, ClipboardList, Trash2, QrCode, Download
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
-import { APP_URL } from '../utils/config';
+import { APP_URL, API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const RestaurantDetail = () => {
@@ -18,6 +18,8 @@ const RestaurantDetail = () => {
   const [activeTab, setActiveTab] = useState('basic');
   const [editMode, setEditMode] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [payments, setPayments] = useState([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,6 +56,26 @@ const RestaurantDetail = () => {
       });
     }
   }, [restaurant]);
+
+  const fetchPayments = useCallback(async () => {
+    if (!restaurant) return;
+    setLoadingPayments(true);
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(`${API_BASE}/subscriptions/${restaurant.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPayments(data.subscription.payments || []);
+      }
+    } catch { /* silent */ }
+    setLoadingPayments(false);
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (activeTab === 'subscription') fetchPayments();
+  }, [activeTab, fetchPayments]);
 
   if (!restaurant) {
     return (
@@ -525,38 +547,30 @@ const RestaurantDetail = () => {
                   </div>
                 </div>
 
-                {/* Payment History (Mock) */}
+                {/* Payment History */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-bold text-gray-900 mb-3">Recent Payments</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center pb-2 border-b">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{restaurant.plan} - May 2026</p>
-                        <p className="text-xs text-gray-500">May 1, 2026</p>
-                      </div>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-                        Paid
-                      </span>
+                  {loadingPayments ? (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#FF6B35] border-t-transparent" />
                     </div>
-                    <div className="flex justify-between items-center pb-2 border-b">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{restaurant.plan} - Apr 2026</p>
-                        <p className="text-xs text-gray-500">Apr 1, 2026</p>
-                      </div>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-                        Paid
-                      </span>
+                  ) : payments.length > 0 ? (
+                    <div className="space-y-3">
+                      {payments.slice(0, 5).map((p, i) => (
+                        <div key={p.id || i} className="flex justify-between items-center pb-2 border-b last:border-b-0">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{p.plan} - {new Date(p.payment_date).toLocaleDateString('en-PK', { month: 'short', year: 'numeric' })}</p>
+                            <p className="text-xs text-gray-500">{new Date(p.payment_date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                          </div>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${p.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {p.status === 'completed' ? 'Paid' : p.status}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{restaurant.plan} - Mar 2026</p>
-                        <p className="text-xs text-gray-500">Mar 1, 2026</p>
-                      </div>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
-                        Paid
-                      </span>
-                    </div>
-                  </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-400 text-sm">No payments yet</div>
+                  )}
                 </div>
               </div>
 
