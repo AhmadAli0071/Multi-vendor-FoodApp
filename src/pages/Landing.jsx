@@ -216,36 +216,39 @@ const Landing = () => {
               <CreditCard size={20} className="text-[#FF6B35]" /> Pay Via
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {paymentMethods?.jazzcash && (
-                <button
-                  onClick={() => { setSelectedMethod('JazzCash'); navigator.clipboard.writeText(paymentMethods.jazzcash); toast.success('JazzCash number copied!'); }}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${selectedMethod === 'JazzCash' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-orange-200'}`}
-                >
-                  <p className="font-bold text-gray-800">{paymentMethods.jazzcash_name}</p>
-                  <p className="text-gray-500 text-sm mt-1">{paymentMethods.jazzcash}</p>
-                  <span className="text-xs text-[#FF6B35] mt-2 inline-block">Tap to copy & select</span>
-                </button>
-              )}
-              {paymentMethods?.easypaisa && (
-                <button
-                  onClick={() => { setSelectedMethod('EasyPaisa'); navigator.clipboard.writeText(paymentMethods.easypaisa); toast.success('EasyPaisa number copied!'); }}
-                  className={`p-4 rounded-xl border-2 text-left transition-all ${selectedMethod === 'EasyPaisa' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-green-200'}`}
-                >
-                  <p className="font-bold text-gray-800">{paymentMethods.easypaisa_name}</p>
-                  <p className="text-gray-500 text-sm mt-1">{paymentMethods.easypaisa}</p>
-                  <span className="text-xs text-green-600 mt-2 inline-block">Tap to copy & select</span>
-                </button>
-              )}
-              {paymentMethods?.bank_account && (
-                <button
-                  onClick={() => { setSelectedMethod('Bank'); navigator.clipboard.writeText(paymentMethods.bank_account); toast.success('Bank account copied!'); }}
-                  className={`p-4 rounded-xl border-2 text-left transition-all col-span-full ${selectedMethod === 'Bank' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-blue-200'}`}
-                >
-                  <p className="font-bold text-gray-800">{paymentMethods.bank_name}</p>
-                  <p className="text-gray-500 text-sm mt-1">{paymentMethods.bank_account}</p>
-                  <span className="text-xs text-blue-600 mt-2 inline-block">Tap to copy & select</span>
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setSelectedMethod('JazzCash');
+                  if (paymentMethods?.jazzcash) { navigator.clipboard.writeText(paymentMethods.jazzcash); toast.success('JazzCash number copied!'); }
+                }}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${selectedMethod === 'JazzCash' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-orange-200'}`}
+              >
+                <p className="font-bold text-gray-800">{paymentMethods?.jazzcash_name || 'JazzCash'}</p>
+                <p className="text-gray-500 text-sm mt-1">{paymentMethods?.jazzcash || 'Not configured'}</p>
+                <span className="text-xs text-[#FF6B35] mt-2 inline-block">Tap to select</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedMethod('EasyPaisa');
+                  if (paymentMethods?.easypaisa) { navigator.clipboard.writeText(paymentMethods.easypaisa); toast.success('EasyPaisa number copied!'); }
+                }}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${selectedMethod === 'EasyPaisa' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-green-200'}`}
+              >
+                <p className="font-bold text-gray-800">{paymentMethods?.easypaisa_name || 'EasyPaisa'}</p>
+                <p className="text-gray-500 text-sm mt-1">{paymentMethods?.easypaisa || 'Not configured'}</p>
+                <span className="text-xs text-green-600 mt-2 inline-block">Tap to select</span>
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedMethod('Bank');
+                  if (paymentMethods?.bank_account) { navigator.clipboard.writeText(paymentMethods.bank_account); toast.success('Bank account copied!'); }
+                }}
+                className={`p-4 rounded-xl border-2 text-left transition-all col-span-full ${selectedMethod === 'Bank' ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-blue-200'}`}
+              >
+                <p className="font-bold text-gray-800">{paymentMethods?.bank_name || 'Bank'}</p>
+                <p className="text-gray-500 text-sm mt-1">{paymentMethods?.bank_account || 'Not configured'}</p>
+                <span className="text-xs text-blue-600 mt-2 inline-block">Tap to select</span>
+              </button>
             </div>
 
             {/* Selected Method */}
