@@ -128,6 +128,23 @@ const RestaurantDetail = () => {
     toast.success(`Subscription renewed for ${months} month(s)!`);
   };
 
+  const handleToggleActive = async () => {
+    const newActive = !restaurant.active;
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(`${API_BASE}/restaurants/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ active: newActive })
+      });
+      const data = await res.json();
+      if (data.success) {
+        updateRestaurant(id, { active: newActive });
+        toast.success(newActive ? 'Subscription activated' : 'Subscription deactivated');
+      }
+    } catch { toast.error('Failed to update'); }
+  };
+
   // Format date
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-PK', {
@@ -540,9 +557,18 @@ const RestaurantDetail = () => {
                       <span className="text-gray-600">Delivery</span>
                       <span className="font-medium">{restaurant.deliveryAvailable ? '✓ Enabled' : '✗ Disabled'}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center pt-2 border-t">
                       <span className="text-gray-600">Pickup</span>
                       <span className="font-medium">{restaurant.pickupAvailable ? '✓ Enabled' : '✗ Disabled'}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <span className="text-gray-600">Status</span>
+                      <button
+                        onClick={handleToggleActive}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${restaurant.active ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                      >
+                        {restaurant.active ? 'Active' : 'Inactive'}
+                      </button>
                     </div>
                   </div>
                 </div>

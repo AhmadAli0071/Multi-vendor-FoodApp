@@ -183,15 +183,19 @@ const Landing = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-500 text-sm">Status</span>
-                {restaurant.is_expired ? (
+                {restaurant.is_expired || !restaurant.active ? (
                   <span className="flex items-center gap-1.5 text-red-600 font-semibold text-sm">
                     <AlertCircle size={16} /> Expired
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 text-green-600 font-semibold text-sm">
-                    <CheckCircle size={16} /> Active ({restaurant.days_left} days left)
+                    <CheckCircle size={16} /> Active
                   </span>
                 )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500 text-sm">Valid Until</span>
+                <span className="text-gray-900 font-semibold text-sm">{new Date(restaurant.subscription_end).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
               <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                 <span className="text-gray-500 text-sm">Monthly Due</span>
@@ -200,6 +204,9 @@ const Landing = () => {
             </div>
           </div>
 
+          {/* Payment Methods + Upload - only if expired or inactive */}
+          {(restaurant.is_expired || !restaurant.active) ? (
+            <>
           {/* Payment Methods */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -298,6 +305,14 @@ const Landing = () => {
               </button>
             </form>
           </div>
+            </>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-lg border border-green-200 p-6 text-center">
+              <CheckCircle size={32} className="text-green-500 mx-auto mb-2" />
+              <p className="text-green-700 font-semibold">Subscription Active</p>
+              <p className="text-gray-500 text-sm mt-1">No payment needed until {new Date(restaurant.subscription_end).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+            </div>
+          )}
         </div>
       )}
 

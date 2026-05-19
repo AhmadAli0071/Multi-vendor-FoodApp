@@ -17,7 +17,7 @@ router.get('/lookup/:paymentId', async (req, res) => {
 
     const today = new Date().toISOString().split('T')[0];
     const endDate = restaurant.subscription_end || '';
-    const isExpired = endDate < today;
+    const isExpired = endDate < today || !restaurant.active;
     const daysLeft = endDate ? Math.ceil((new Date(endDate) - new Date()) / 86400000) : 0;
     const planPrice = planPrices[restaurant.plan] || 5999;
 
