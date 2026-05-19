@@ -122,8 +122,8 @@ const Landing = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
       {/* Hero */}
       <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] to-[#E63946] opacity-[0.03]" />
-        <div className="max-w-6xl mx-auto px-4 py-16 md:py-24">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] to-[#E63946] opacity-[0.03] pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow-sm border border-orange-100 mb-6">
               <Utensils size={18} className="text-[#FF6B35]" />
