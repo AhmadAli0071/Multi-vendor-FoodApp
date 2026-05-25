@@ -205,12 +205,12 @@ const MenuManagement = () => {
       {/* Category Modal */}
       {showCatModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-start sm:items-center justify-center" onClick={() => setShowCatModal(false)}>
-          <div className="bg-white rounded-b-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-down flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-b-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-down flex flex-col max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-base font-bold">{editingCat ? 'Edit Category' : 'New Category'}</h2>
               <button onClick={() => setShowCatModal(false)} className="p-1"><X size={20} /></button>
             </div>
-            <div className="p-4 space-y-3 overflow-y-auto flex-1">
+            <div className="p-4 space-y-3">
               <input type="text" value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder="Category name" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35]" />
               <input type="text" value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} placeholder="Description" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35]" />
               <input type="text" value={catForm.icon} onChange={(e) => setCatForm({ ...catForm, icon: e.target.value })} placeholder="Emoji icon" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35]" />
@@ -226,12 +226,12 @@ const MenuManagement = () => {
       {/* Item Modal */}
       {showItemModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-start sm:items-center justify-center" onClick={() => setShowItemModal(false)}>
-          <div className="bg-white rounded-b-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-down flex flex-col max-h-[90dvh]" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-b-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-down flex flex-col max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-base font-bold">{editingItem ? 'Edit Item' : 'New Item'}</h2>
               <button onClick={() => setShowItemModal(false)} className="p-1"><X size={20} /></button>
             </div>
-            <div className="p-4 space-y-3 overflow-y-auto flex-1">
+            <div className="p-4 space-y-3">
               <input type="text" value={itemForm.name} onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })} placeholder="Item name" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35]" />
               <textarea value={itemForm.description} onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })} rows={3} placeholder="Description" className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-[#FF6B35] resize-none" />
               <div className="grid grid-cols-2 gap-3">
