@@ -17,6 +17,50 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: APP_URL
-        value: https://foodapp.onrender.com
+        value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
-        value: https://foodapp.onrender.com
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
+
+  - type: web
+    name: foodapp-admin
+    env: node
+    region: singapore
+    buildCommand: npm run render-build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@foodapp.pk
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: APP_URL
+        value: https://foodapp-a0t0.onrender.com
+      - key: CORS_ORIGINS
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
+
+  - type: web
+    name: foodapp-owner
+    env: node
+    region: singapore
+    buildCommand: npm run render-build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@foodapp.pk
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: APP_URL
+        value: https://foodapp-a0t0.onrender.com
+      - key: CORS_ORIGINS
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
