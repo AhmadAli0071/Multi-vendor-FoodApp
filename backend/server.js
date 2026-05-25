@@ -80,6 +80,9 @@ export const emitOrderStatusChange = (io, orderId, status, order) => {
   console.log(`[Socket] Emitted status update for order ${orderId}: ${status}`);
 };
 
+// Trust proxy (Render sits behind a proxy)
+app.set('trust proxy', 1);
+
 // CORS
 app.use(cors(corsOptions));
 
