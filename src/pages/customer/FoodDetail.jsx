@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
-import { Minus, Plus, ShoppingCart, Clock, Star, Flame, ChevronLeft } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Clock, Flame, ChevronLeft } from 'lucide-react';
 
 const FoodDetail = () => {
   const { itemId } = useParams();
@@ -46,7 +46,7 @@ const FoodDetail = () => {
       </button>
 
       {/* Hero Image */}
-      <div className="h-72 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: primaryColor }}>
+      <div className="h-56 sm:h-72 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: primaryColor }}>
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 right-10 w-40 h-40 rounded-full bg-white" />
           <div className="absolute bottom-0 left-5 w-32 h-32 rounded-full bg-white" />

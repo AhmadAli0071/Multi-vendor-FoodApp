@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Store,
-  PlusCircle,
-  ClipboardList,
-  CreditCard,
-  Megaphone,
-  Settings,
-  Menu,
-  X
+  LayoutDashboard, Store, PlusCircle, ClipboardList,
+  CreditCard, Megaphone, Settings, X
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {

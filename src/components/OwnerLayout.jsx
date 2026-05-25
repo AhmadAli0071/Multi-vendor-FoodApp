@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { NavLink, useOutlet, Navigate } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ClipboardList,
-  Settings, Power, PowerOff, LogOut, Store, Copy
+  Settings, Power, PowerOff, LogOut, Copy
 } from 'lucide-react';
 import { useOwner } from '../context/OwnerContext';
 import InstallPrompt from './InstallPrompt';
@@ -70,7 +70,7 @@ const OwnerLayout = () => {
             )}
           </div>
           <div className="min-w-0">
-            <h1 className="font-bold text-sm leading-tight truncate max-w-[140px]">{restaurant.name}</h1>
+            <h1 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-[220px]">{restaurant.name}</h1>
             <div className="flex items-center gap-1">
               <span className={`inline-block w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-300' : 'bg-red-300'}`}></span>
               <span className="text-[10px] opacity-80">{isOpen ? 'Open' : 'Closed'}</span>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Radio, CheckSquare, Square, Send, Users, AlertCircle } from 'lucide-react';
+import { Radio, CheckSquare, Send, Users, AlertCircle } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, ArrowLeft, Home, ClipboardList, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, ArrowLeft, Home } from 'lucide-react';
 import { CustomerProvider, useCustomer } from '../context/CustomerContext';
 import InstallPrompt from './InstallPrompt';
 import { updateManifest } from '../utils/manifest';
@@ -80,8 +80,8 @@ const CustomerLayoutInner = ({ children }) => {
                 <span className="text-base">{restaurant?.logo && restaurant.logo.length < 5 ? restaurant.logo : '🍔'}</span>
               </div>
               <div className="min-w-0">
-                <h1 className="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[140px]">{restaurant?.name || 'Menu'}</h1>
-                <p className="text-[10px] text-gray-400 truncate max-w-[140px]">{restaurant?.delivery_available ? 'Delivery & Pickup' : 'Pickup only'}</p>
+                <h1 className="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[160px] sm:max-w-[220px]">{restaurant?.name || 'Menu'}</h1>
+                <p className="text-[10px] text-gray-400 truncate max-w-[160px] sm:max-w-[220px]">{restaurant?.delivery_available ? 'Delivery & Pickup' : 'Pickup only'}</p>
               </div>
             </Link>
           </div>

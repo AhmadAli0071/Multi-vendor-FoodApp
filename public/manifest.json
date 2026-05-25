@@ -51,15 +51,6 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/icons/screenshot.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "FoodApp Menu"
-    }
-  ],
   "categories": ["food", "lifestyle", "shopping"],
   "lang": "en"
 }

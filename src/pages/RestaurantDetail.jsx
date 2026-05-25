@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Store, Phone, MapPin, Calendar, CreditCard, Edit2, Save, X, ClipboardList, Trash2, QrCode, Download
@@ -20,6 +20,7 @@ const RestaurantDetail = () => {
   const [showQR, setShowQR] = useState(false);
   const [payments, setPayments] = useState([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
+  const qrRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -647,18 +648,17 @@ const RestaurantDetail = () => {
               <div><h3 className="text-lg font-bold text-gray-800">{restaurant.name}</h3><p className="text-xs text-gray-500">Customer App QR</p></div>
               <button onClick={() => setShowQR(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
             </div>
-            <div className="bg-gray-50 rounded-xl p-4 flex justify-center mb-3">
+            <div className="bg-gray-50 rounded-xl p-4 flex justify-center mb-3" ref={qrRef}>
               <QRCodeSVG value={customerQrUrl} size={200} level="M" />
             </div>
             <p className="text-xs text-center text-gray-500 mb-3 break-all">{customerQrUrl}</p>
             <div className="flex gap-2">
-              <button onClick={() => { const s = document.querySelector('.detail-qr svg'); if (s) { const c = document.createElement('canvas'); const i = new Image(); i.onload = () => { c.width = i.width; c.height = i.height; c.getContext('2d').drawImage(i,0,0); const a = document.createElement('a'); a.download = `qr-${restaurant.slug}.png`; a.href = c.toDataURL(); a.click(); }; i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(s)); } }} className="flex-1 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1"><Download size={14} /> Download</button>
+              <button onClick={() => { const s = qrRef.current?.querySelector('svg'); if (s) { const c = document.createElement('canvas'); const i = new Image(); i.onload = () => { c.width = i.width; c.height = i.height; c.getContext('2d').drawImage(i,0,0); const a = document.createElement('a'); a.download = `qr-${restaurant.slug}.png`; a.href = c.toDataURL(); a.click(); }; i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(s)); } }} className="flex-1 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1"><Download size={14} /> Download</button>
               <button onClick={() => setShowQR(false)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Close</button>
             </div>
           </div>
         </div>
       )}
-      <div className="detail-qr hidden"><QRCodeSVG value={customerQrUrl} size={200} level="M" /></div>
     </div>
   );
 };

@@ -177,11 +177,11 @@ const MenuManagement = () => {
                                 <h4 className="text-sm font-medium text-gray-800 truncate">{item.name}</h4>
                                 <p className="text-xs text-gray-400 truncate">{item.description}</p>
                               </div>
-                              <div className="text-sm font-bold text-[#FF6B35]">PKR {Number(item.price).toLocaleString()}</div>
-                              <button onClick={(e) => { e.stopPropagation(); openItemModal(cat.id, item); }} className="p-1.5 text-gray-400 active:text-[#FF6B35]">
+                              <div className="text-sm font-bold text-[#FF6B35] flex-shrink-0 whitespace-nowrap">PKR {Number(item.price).toLocaleString()}</div>
+                              <button onClick={(e) => { e.stopPropagation(); openItemModal(cat.id, item); }} className="p-2 text-gray-400 hover:text-[#FF6B35]">
                                 <Edit3 size={14} />
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(cat.id, item._id || item.id); }} className="p-1.5 text-gray-400 active:text-red-500">
+                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(cat.id, item._id || item.id); }} className="p-2 text-gray-400 hover:text-red-500">
                                 <Trash2 size={14} />
                               </button>
                             </div>

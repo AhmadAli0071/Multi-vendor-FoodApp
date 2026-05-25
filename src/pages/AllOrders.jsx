@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
@@ -117,7 +117,7 @@ const AllOrders = () => {
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Status Filter */}
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
             <div className="relative">
               <select
@@ -137,7 +137,7 @@ const AllOrders = () => {
           </div>
 
           {/* Restaurant Filter */}
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">Restaurant</label>
             <div className="relative">
               <select
@@ -155,7 +155,7 @@ const AllOrders = () => {
           </div>
 
           {/* Date Filter */}
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
             <input
               type="date"
@@ -319,20 +319,20 @@ const AllOrders = () => {
           <p className="text-sm text-gray-600">
             Showing {startIndex + 1}-{Math.min(startIndex + ordersPerPage, filteredOrders.length)} of {filteredOrders.length} orders
           </p>
-          <div className="flex space-x-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
             >
               Previous
             </button>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center gap-1 overflow-x-auto max-w-[180px] sm:max-w-none">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 rounded-lg transition-colors ${
+                  className={`w-9 h-9 rounded-lg text-sm transition-colors flex-shrink-0 ${
                     currentPage === page
                       ? 'bg-[#FF6B35] text-white'
                       : 'bg-white border border-gray-300 hover:bg-gray-50'
@@ -345,7 +345,7 @@ const AllOrders = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
             >
               Next
             </button>

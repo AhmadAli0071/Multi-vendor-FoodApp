@@ -66,17 +66,17 @@ const CartPage = () => {
 
             {/* Quantity Controls */}
             <div className="flex items-center gap-1 bg-gray-50 rounded-xl px-2 py-1.5">
-              <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 rounded-lg bg-white flex items-center justify-center shadow-sm active:scale-90 transition-transform border border-gray-100">
-                <Minus size={12} className="text-gray-600" />
+              <button onClick={() => updateQuantity(item.id, -1)} className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-sm active:scale-90 transition-transform border border-gray-100">
+                <Minus size={14} className="text-gray-600" />
               </button>
               <span className="w-5 text-center font-bold text-sm text-gray-800">{item.quantity}</span>
-              <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 rounded-lg text-white flex items-center justify-center shadow-sm active:scale-90 transition-transform" style={{ backgroundColor: primaryColor }}>
-                <Plus size={12} />
+              <button onClick={() => updateQuantity(item.id, 1)} className="w-9 h-9 rounded-lg text-white flex items-center justify-center shadow-sm active:scale-90 transition-transform" style={{ backgroundColor: primaryColor }}>
+                <Plus size={14} />
               </button>
             </div>
 
             {/* Price */}
-            <div className="text-right flex-shrink-0 w-16">
+            <div className="text-right flex-shrink-0 whitespace-nowrap min-w-[60px]">
               <p className="text-sm font-extrabold text-gray-800">Rs. {item.price * item.quantity}</p>
             </div>
 

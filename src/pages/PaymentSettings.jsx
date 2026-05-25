@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Save, CheckCircle } from 'lucide-react';
+import { CreditCard, Save } from 'lucide-react';
 import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 

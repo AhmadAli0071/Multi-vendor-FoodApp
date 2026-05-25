@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
-import { Clock, CheckCircle2, Circle, Loader2, MessageCircle, Phone, Package, MapPin } from 'lucide-react';
+import { Clock, CheckCircle2, Loader2, MessageCircle, Phone, Package, MapPin, User } from 'lucide-react';
 
 const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: Clock, desc: 'Your order has been received' },

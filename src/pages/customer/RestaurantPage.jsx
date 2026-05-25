@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
-import { Search, ShoppingCart, Plus, Star, Clock, MapPin, Phone, Flame, Sparkles, ChevronRight, Tag } from 'lucide-react';
+import { Search, Plus, Star, Clock, MapPin, Phone, Flame, Sparkles, ChevronRight, Tag } from 'lucide-react';
 
 const RestaurantPage = () => {
   const slug = useCustomerSlug();

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Upload, Eye, X } from 'lucide-react';
+import { Plus, Upload, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
 import { uploadImage } from '../utils/api';
@@ -34,6 +34,7 @@ const AddRestaurant = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [newRestaurant, setNewRestaurant] = useState(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const qrRef = useRef(null);
 
   // Calculate end date when start date or plan changes
   useEffect(() => {
@@ -559,7 +560,7 @@ const AddRestaurant = () => {
 
             {/* QR Code */}
             <div className="flex flex-col items-center mb-6">
-              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm mb-4">
+              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm mb-4" ref={qrRef}>
                 <QRCodeSVG
                   value={customerUrl}
                   size={200}
@@ -570,7 +571,8 @@ const AddRestaurant = () => {
               <div className="flex space-x-3">
                 <button
                   onClick={() => {
-                    const svg = document.querySelector('.react-qr-code svg');
+                    const svg = qrRef.current?.querySelector('svg');
+                    if (!svg) return;
                     const svgData = new XMLSerializer().serializeToString(svg);
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');

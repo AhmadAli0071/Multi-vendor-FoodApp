@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CreditCard, Upload, CheckCircle, AlertCircle, Clock, Copy, ExternalLink, Utensils, Shield, Zap, Star } from 'lucide-react';
+import { Search, CreditCard, Upload, CheckCircle, AlertCircle, Utensils, Shield, Zap } from 'lucide-react';
 import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 

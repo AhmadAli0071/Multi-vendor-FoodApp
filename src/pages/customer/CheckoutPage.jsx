@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
-import { MapPin, Phone, User, CheckCircle, ShoppingBag, ChevronRight, Shield } from 'lucide-react';
+import { MapPin, User, CheckCircle, ShoppingBag, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CheckoutPage = () => {

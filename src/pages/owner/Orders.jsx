@@ -114,22 +114,24 @@ const OwnerOrders = () => {
                 {isExpanded && (
                   <div className="border-t border-gray-100 p-3 space-y-4">
                     {/* Timeline */}
-                    <div className="flex items-center justify-between relative px-2">
-                      <div className="absolute top-3 left-2 right-2 h-0.5 bg-gray-200"></div>
-                      <div className="absolute top-3 left-2 h-0.5 bg-[#FF6B35] rounded" style={{ width: `${Math.max(0, (statusStep / 4) * 100 - 2)}%` }}></div>
-                      {steps.map((step, idx) => {
-                        const Icon = statusIcons[['pending', 'accepted', 'preparing', 'ready', 'delivered'][idx]] || Clock;
-                        const done = idx <= statusStep;
-                        const current = idx === statusStep;
-                        return (
-                          <div key={step} className="flex flex-col items-center z-10">
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center ${done ? (current ? 'bg-[#FF6B35] text-white ring-2 ring-orange-100' : 'bg-[#FF6B35] text-white') : 'bg-gray-200 text-gray-400'}`}>
-                              <Icon size={12} />
+                    <div className="overflow-x-auto -mx-3 px-3">
+                      <div className="flex items-center justify-between relative min-w-[320px] px-2">
+                        <div className="absolute top-3 left-2 right-2 h-0.5 bg-gray-200"></div>
+                        <div className="absolute top-3 left-2 h-0.5 bg-[#FF6B35] rounded" style={{ width: `${Math.max(0, (statusStep / 4) * 100 - 2)}%` }}></div>
+                        {steps.map((step, idx) => {
+                          const Icon = statusIcons[['pending', 'accepted', 'preparing', 'ready', 'delivered'][idx]] || Clock;
+                          const done = idx <= statusStep;
+                          const current = idx === statusStep;
+                          return (
+                            <div key={step} className="flex flex-col items-center z-10">
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center ${done ? (current ? 'bg-[#FF6B35] text-white ring-2 ring-orange-100' : 'bg-[#FF6B35] text-white') : 'bg-gray-200 text-gray-400'}`}>
+                                <Icon size={12} />
+                              </div>
+                              <span className={`text-[9px] mt-1 ${done ? 'text-[#FF6B35] font-medium' : 'text-gray-400'}`}>{step}</span>
                             </div>
-                            <span className={`text-[9px] mt-1 ${done ? 'text-[#FF6B35] font-medium' : 'text-gray-400'}`}>{step}</span>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Details */}

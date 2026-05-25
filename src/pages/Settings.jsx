@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Globe, DollarSign, Clock, Bell, Smartphone, AlertTriangle, Save, Trash2 } from 'lucide-react';
+import { User, Mail, Lock, Globe, Bell, AlertTriangle, Save, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 const Settings = () => {
-  const { orders } = useAppContext();
+  const { orders, restaurants } = useAppContext();
 
   const [adminProfile, setAdminProfile] = useState({
     name: 'Super Admin',
