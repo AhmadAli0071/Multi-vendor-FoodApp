@@ -1,11 +1,16 @@
+import { DOMAIN } from './config';
+
+export function isSubdomainMode() {
+  return !!DOMAIN;
+}
+
 export function getSubdomain() {
+  if (!isSubdomainMode()) return null;
   const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1' || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)) {
-    return null;
-  }
+  const domainParts = DOMAIN.split('.').length;
   const parts = hostname.split('.');
-  if (parts.length >= 3) {
-    return parts[0];
+  if (parts.length > domainParts) {
+    return parts.slice(0, parts.length - domainParts).join('.');
   }
   return null;
 }
