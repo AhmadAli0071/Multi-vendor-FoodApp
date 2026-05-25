@@ -19,7 +19,7 @@ services:
       - key: APP_URL
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
-        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
 
   - type: web
     name: foodapp-admin
@@ -41,7 +41,7 @@ services:
       - key: APP_URL
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
-        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
 
   - type: web
     name: foodapp-owner
@@ -63,4 +63,4 @@ services:
       - key: APP_URL
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
-        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin.onrender.com,https://foodapp-owner.onrender.com"
+        value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
