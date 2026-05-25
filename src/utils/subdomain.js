@@ -26,6 +26,7 @@ export function getSubdomain() {
 export function getAppType() {
   const serviceName = getRenderServiceName();
   if (serviceName) {
+    if (serviceName.includes('landing')) return 'landing';
     if (serviceName.includes('owner')) return 'owner';
     if (serviceName.includes('admin')) return 'admin';
     return 'admin';

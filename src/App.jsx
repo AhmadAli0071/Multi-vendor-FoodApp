@@ -133,6 +133,10 @@ function AppContent() {
     return <OwnerSubdomainRoutes />;
   }
 
+  if (appType === 'landing') {
+    return <Landing />;
+  }
+
   return <PathBasedRoutes />;
 }
 
