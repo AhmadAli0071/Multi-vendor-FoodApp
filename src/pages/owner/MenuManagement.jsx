@@ -205,7 +205,7 @@ const MenuManagement = () => {
       {/* Category Modal */}
       {showCatModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center" onClick={() => setShowCatModal(false)}>
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-up" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm shadow-xl animate-slide-up max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-base font-bold">{editingCat ? 'Edit Category' : 'New Category'}</h2>
               <button onClick={() => setShowCatModal(false)} className="p-1"><X size={20} /></button>
