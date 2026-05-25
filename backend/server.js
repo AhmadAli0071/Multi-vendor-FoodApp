@@ -115,6 +115,66 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'FoodApp Backend Running', timestamp: new Date().toISOString() });
 });
 
+// Utility to detect subdomain from host
+function getSubdomain(hostname) {
+  if (!hostname) return null;
+  const parts = hostname.split('.');
+  if (parts.length >= 3) {
+    return parts[0];
+  }
+  return null;
+}
+
+// Dynamic manifest.json based on subdomain (for separate PWA apps)
+app.get('/manifest.json', (req, res) => {
+  const subdomain = getSubdomain(req.hostname);
+  const isOwner = subdomain === 'owner';
+  const isCustomer = subdomain && subdomain !== 'admin' && subdomain !== 'owner' && subdomain !== 'www';
+
+  let name = 'FoodApp Admin';
+  let shortName = 'FoodApp';
+
+  if (isOwner) {
+    name = 'FoodApp Owner';
+    shortName = 'Owner';
+  } else if (isCustomer) {
+    name = subdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    shortName = subdomain.length > 10 ? subdomain.substring(0, 10) + '..' : subdomain;
+  }
+
+  res.json({
+    name, short_name: shortName,
+    description: `FoodApp - ${name}`,
+    start_url: '/', display: 'standalone',
+    background_color: '#FFFFFF', theme_color: '#FF6B35',
+    orientation: 'portrait-primary',
+    icons: [
+      { src: '/icons/icon-72.png', sizes: '72x72', type: 'image/png' },
+      { src: '/icons/icon-96.png', sizes: '96x96', type: 'image/png' },
+      { src: '/icons/icon-128.png', sizes: '128x128', type: 'image/png' },
+      { src: '/icons/icon-144.png', sizes: '144x144', type: 'image/png' },
+      { src: '/icons/icon-152.png', sizes: '152x152', type: 'image/png' },
+      { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+      { src: '/icons/icon-384.png', sizes: '384x384', type: 'image/png' },
+      { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+    ],
+    categories: ['food', 'lifestyle'], lang: 'en'
+  });
+});
+
+// Dynamic service worker based on subdomain (separate caches = separate PWA)
+app.get('/sw.js', (req, res) => {
+  const subdomain = getSubdomain(req.hostname) || 'admin';
+  res.type('application/javascript');
+  res.send(`
+    const CACHE_NAME = 'foodapp-${subdomain}-v1';
+    const ASSETS = ['/','/index.html','/manifest.json','/icons/icon-192.png','/icons/icon-512.png'];
+    self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
+    self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
+    self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(c=>{let f=fetch(e.request).then(r=>{if(r&&r.status===200&&r.type==='basic'){let cl=r.clone();caches.open(CACHE_NAME).then(ca=>ca.put(e.request,cl))}return r}).catch(()=>{if(e.request.mode==='navigate')return caches.match('/');return c});return c||f}));});
+  `);
+});
+
 // Serve frontend in production (MUST be after API routes, before 404)
 const distPath = path.resolve(__dirname, '..', 'dist');
 if (process.env.NODE_ENV === 'production') {

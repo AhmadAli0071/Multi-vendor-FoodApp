@@ -13,6 +13,14 @@
     <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
     <link rel="manifest" href="/manifest.json" />
+    <script>
+      const subdomain = window.location.hostname.split('.');
+      const appName = subdomain.length >= 3 && subdomain[0] !== 'www'
+        ? subdomain[0].charAt(0).toUpperCase() + subdomain[0].slice(1).replace(/-/g, ' ')
+        : 'FoodApp';
+      document.title = appName + ' - Food Ordering';
+      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', appName);
+    </script>
     <title>FoodApp - Food Ordering Platform</title>
     <meta name="description" content="Order delicious food from your favorite restaurants. Smart, fast, and easy food ordering platform." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +29,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(
+          navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(
             (registration) => { console.log('SW registered:', registration.scope); },
             (error) => { console.log('SW registration failed:', error); }
           );

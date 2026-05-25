@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
-  const { slug } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, login } = useCustomer();
+  const { restaurant, login, nav } = useCustomer();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const LoginPage = () => {
     try {
       await login(form.email, form.password);
       toast.success('Welcome!');
-      navigate(`/r/${slug}`);
+      navigate(nav('/'));
     } catch (err) {
       toast.error(err.message || 'Login failed');
     } finally { setLoading(false); }
@@ -79,7 +79,7 @@ const LoginPage = () => {
 
       <p className="text-center text-xs text-gray-400 mt-6">
         Don't have an account?{' '}
-        <Link to={`/r/${slug}/signup`} className="font-bold" style={{ color: primaryColor }}>Sign Up</Link>
+        <Link to={nav('/signup')} className="font-bold" style={{ color: primaryColor }}>Sign Up</Link>
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { API_BASE, WS_URL } from '../utils/config.js';
 
@@ -12,7 +13,14 @@ export const useCustomer = () => {
   return ctx;
 };
 
-export const CustomerProvider = ({ children }) => {
+export function useCustomerSlug() {
+  const ctx = useContext(CustomerContext);
+  if (!ctx) return null;
+  const { slug: paramSlug } = useParams();
+  return ctx.slug || paramSlug;
+}
+
+export const CustomerProvider = ({ children, slug: providerSlug }) => {
   const [restaurant, setRestaurant] = useState(null);
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -256,8 +264,15 @@ export const CustomerProvider = ({ children }) => {
     return () => { s.disconnect(); };
   }, []);
 
+  const { slug: paramSlug } = useParams();
+  const nav = (path) => {
+    if (providerSlug) return path;
+    return `/r/${paramSlug}${path}`;
+  };
+
   const value = {
     restaurant, menu, loading, error, loadRestaurant,
+    slug: providerSlug, nav,
     customer, token, login, signup, logout,
     cart, addToCart, updateQuantity, removeFromCart, clearCart, cartTotal, cartCount,
     placeOrder, getOrderHistory, getOrder,

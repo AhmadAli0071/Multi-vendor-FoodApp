@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate } from 'react-router-dom';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Search, ShoppingCart, Plus, Star, Clock, MapPin, Phone, Flame, Sparkles, ChevronRight, Tag } from 'lucide-react';
 
 const RestaurantPage = () => {
-  const { slug } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, menu, loading, error, addToCart, cartCount, cartTotal } = useCustomer();
+  const { restaurant, menu, loading, error, addToCart, cartCount, cartTotal, nav } = useCustomer();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
 
@@ -140,7 +140,7 @@ const RestaurantPage = () => {
             {popularItems.map(item => (
               <div
                 key={item.id}
-                onClick={() => navigate(`/r/${slug}/item/${item.id}`)}
+                onClick={() => navigate(nav(`/item/${item.id}`))}
                 className="flex-shrink-0 w-36 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer active:scale-95 transition-transform"
               >
                 <div className="h-24 bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center relative">
@@ -211,7 +211,7 @@ const RestaurantPage = () => {
           filteredItems.map((item, idx) => (
             <div
               key={item.id}
-              onClick={() => navigate(`/r/${slug}/item/${item.id}`)}
+              onClick={() => navigate(nav(`/item/${item.id}`))}
               className="group bg-white rounded-2xl p-3 flex items-center gap-3.5 shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-pink-100 transition-all active:scale-[0.99]"
             >
               {/* Image */}

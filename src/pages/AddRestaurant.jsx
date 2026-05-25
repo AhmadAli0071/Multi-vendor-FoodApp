@@ -4,7 +4,7 @@ import { Plus, Upload, Eye, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
 import { uploadImage } from '../utils/api';
-import { APP_URL } from '../utils/config';
+import { APP_URL, getCustomerAppUrl } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const AddRestaurant = () => {
@@ -141,7 +141,7 @@ const AddRestaurant = () => {
     Premium: { price: 9999, limit: '+ Payment Gateway' }
   };
 
-  const customerUrl = `${APP_URL}/r/${generateSlug(formData.name || 'restaurant')}`;
+  const customerUrl = getCustomerAppUrl(generateSlug(formData.name || 'restaurant'));
   const ownerUrl = `${APP_URL}/owner`;
 
   return (

@@ -1,12 +1,12 @@
 import React from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Minus, Plus, Trash2, ShoppingBag, Sparkles, Clock, ChevronRight } from 'lucide-react';
 
 const CartPage = () => {
-  const { slug } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCustomer();
+  const { restaurant, cart, updateQuantity, removeFromCart, cartTotal, clearCart, nav } = useCustomer();
   const primaryColor = restaurant?.primary_color || '#D81B60';
 
   if (cart.items.length === 0) {
@@ -17,7 +17,7 @@ const CartPage = () => {
         </div>
         <h2 className="text-lg font-extrabold text-gray-800 mb-1">Your Cart is Empty</h2>
         <p className="text-sm text-gray-400 text-center mb-6">Add delicious items from the menu</p>
-        <Link to={`/r/${slug}`} className="px-8 py-3.5 rounded-2xl text-white font-bold text-sm shadow-lg active:scale-95 transition-all" style={{ backgroundColor: primaryColor }}>
+        <Link to={nav('/')} className="px-8 py-3.5 rounded-2xl text-white font-bold text-sm shadow-lg active:scale-95 transition-all" style={{ backgroundColor: primaryColor }}>
           Browse Menu
         </Link>
       </div>
@@ -117,7 +117,7 @@ const CartPage = () => {
       {/* Checkout Button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-lg mx-auto safe-bottom">
         <button
-          onClick={() => navigate(`/r/${slug}/checkout`)}
+          onClick={() => navigate(nav('/checkout'))}
           className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] transition-all"
           style={{ backgroundColor: primaryColor }}
         >

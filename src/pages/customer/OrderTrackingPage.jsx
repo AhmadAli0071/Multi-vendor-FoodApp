@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Clock, CheckCircle2, Circle, Loader2, MessageCircle, Phone, Package, MapPin } from 'lucide-react';
 
 const statusSteps = [
@@ -12,9 +12,10 @@ const statusSteps = [
 ];
 
 const OrderTrackingPage = () => {
-  const { slug, orderId } = useParams();
+  const { orderId } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, socket, getOrder } = useCustomer();
+  const { restaurant, socket, getOrder, nav } = useCustomer();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -63,7 +64,7 @@ const OrderTrackingPage = () => {
           <Package size={28} className="text-pink-300" />
         </div>
         <p className="text-sm text-gray-500 mb-4">Order not found</p>
-        <button onClick={() => navigate(`/r/${slug}`)} className="px-5 py-2.5 text-white rounded-xl text-sm font-semibold shadow-lg" style={{ backgroundColor: primaryColor }}>Back to Menu</button>
+        <button onClick={() => navigate(nav('/'))} className="px-5 py-2.5 text-white rounded-xl text-sm font-semibold shadow-lg" style={{ backgroundColor: primaryColor }}>Back to Menu</button>
       </div>
     );
   }

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Minus, Plus, ShoppingCart, Clock, Star, Flame, ChevronLeft } from 'lucide-react';
 
 const FoodDetail = () => {
-  const { slug, itemId } = useParams();
+  const { itemId } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, menu, addToCart } = useCustomer();
+  const { restaurant, menu, addToCart, nav } = useCustomer();
 
   const allItems = menu.flatMap(m => m.items.map(item => ({ ...item, category: m.category, categoryIcon: m.category_icon })));
   const item = allItems.find(i => i.id === itemId);
@@ -20,7 +21,7 @@ const FoodDetail = () => {
           <span className="text-3xl">🔍</span>
         </div>
         <p className="text-sm font-medium text-gray-500">Item not found</p>
-        <button onClick={() => navigate(`/r/${slug}`)} className="mt-4 px-6 py-2.5 bg-pink-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-pink-200">Back to Menu</button>
+        <button onClick={() => navigate(nav('/'))} className="mt-4 px-6 py-2.5 bg-pink-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-pink-200">Back to Menu</button>
       </div>
     );
   }
@@ -31,7 +32,7 @@ const FoodDetail = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart(slug, item);
     }
-    navigate(`/r/${slug}`);
+    navigate(nav('/'));
   };
 
   return (

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Download, X } from 'lucide-react';
+import { getAppType, getRestaurantSlug } from '../utils/subdomain';
 
 let deferredPrompt = null;
 
@@ -10,6 +11,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 const InstallPrompt = () => {
   const [show, setShow] = useState(false);
+
+  const appName = useMemo(() => {
+    const type = getAppType();
+    if (type === 'owner') return 'FoodApp Owner';
+    if (type === 'customer') {
+      const slug = getRestaurantSlug();
+      if (slug) return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+    return 'FoodApp';
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,7 +46,7 @@ const InstallPrompt = () => {
           🍔
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold">Install FoodApp</p>
+          <p className="text-sm font-bold">Install {appName}</p>
           <p className="text-xs text-gray-400">Add to home screen for quick access</p>
         </div>
         <button

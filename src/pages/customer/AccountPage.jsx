@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate } from 'react-router-dom';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Mail, Phone, Clock, Package, ShoppingBag, ChevronRight, MapPin } from 'lucide-react';
 
 const AccountPage = () => {
-  const { slug } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, customer, getOrderHistory } = useCustomer();
+  const { restaurant, customer, getOrderHistory, nav } = useCustomer();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const primaryColor = restaurant?.primary_color || '#D81B60';
 
   useEffect(() => {
-    if (!customer) { navigate(`/r/${slug}/login`); return; }
+    if (!customer) { navigate(nav('/login')); return; }
     loadHistory();
   }, [customer]);
 
@@ -55,14 +55,14 @@ const AccountPage = () => {
 
       {/* Quick Links */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <Link to={`/r/${slug}`} className="flex items-center justify-between px-4 py-3.5 active:bg-gray-50 border-b border-gray-50">
+        <Link to={nav('/')} className="flex items-center justify-between px-4 py-3.5 active:bg-gray-50 border-b border-gray-50">
           <div className="flex items-center gap-3">
             <ShoppingBag size={18} style={{ color: primaryColor }} />
             <span className="text-sm font-semibold text-gray-700">Browse Menu</span>
           </div>
           <ChevronRight size={16} className="text-gray-300" />
         </Link>
-        <Link to={`/r/${slug}/cart`} className="flex items-center justify-between px-4 py-3.5 active:bg-gray-50">
+        <Link to={nav('/cart')} className="flex items-center justify-between px-4 py-3.5 active:bg-gray-50">
           <div className="flex items-center gap-3">
             <Package size={18} style={{ color: primaryColor }} />
             <span className="text-sm font-semibold text-gray-700">View Cart</span>
@@ -86,12 +86,12 @@ const AccountPage = () => {
           <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
             <ShoppingBag size={48} className="text-gray-200 mx-auto mb-3" />
             <p className="text-sm text-gray-400 mb-3">No orders yet</p>
-            <Link to={`/r/${slug}`} className="inline-block px-6 py-2.5 text-white rounded-2xl text-sm font-bold shadow-lg" style={{ backgroundColor: primaryColor }}>Start Ordering</Link>
+            <Link to={nav('/')} className="inline-block px-6 py-2.5 text-white rounded-2xl text-sm font-bold shadow-lg" style={{ backgroundColor: primaryColor }}>Start Ordering</Link>
           </div>
         ) : (
           <div className="space-y-2">
             {orders.map(order => (
-              <Link key={order.id} to={`/r/${slug}/order/${order.id}`}
+              <Link key={order.id} to={nav(`/order/${order.id}`)}
                 className="block bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold text-gray-400">#{order.id}</span>

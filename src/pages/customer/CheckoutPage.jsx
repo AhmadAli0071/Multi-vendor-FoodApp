@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useCustomer } from '../../context/CustomerContext';
+import { useNavigate, Link } from 'react-router-dom';
+import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { MapPin, Phone, User, CheckCircle, ShoppingBag, ChevronRight, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CheckoutPage = () => {
-  const { slug } = useParams();
+  const slug = useCustomerSlug();
   const navigate = useNavigate();
-  const { restaurant, customer, cart, cartTotal, placeOrder, clearCart } = useCustomer();
+  const { restaurant, customer, cart, cartTotal, placeOrder, clearCart, nav } = useCustomer();
 
   const primaryColor = restaurant?.primary_color || '#D81B60';
   const [orderType, setOrderType] = useState(restaurant?.delivery_available ? 'delivery' : 'pickup');
@@ -32,7 +32,7 @@ const CheckoutPage = () => {
       });
       clearCart();
       toast.success('Order placed!');
-      navigate(`/r/${slug}/order/${result.order.id}`);
+      navigate(nav(`/order/${result.order.id}`));
     } catch (err) {
       toast.error(err.message || 'Failed');
     } finally {
@@ -45,7 +45,7 @@ const CheckoutPage = () => {
       <div className="flex flex-col items-center justify-center py-20 px-4">
         <div className="text-4xl mb-3">🛒</div>
         <p className="text-sm text-gray-500 mb-4">Nothing to checkout</p>
-        <Link to={`/r/${slug}`} className="px-5 py-2.5 rounded-xl text-white font-semibold text-sm shadow-lg" style={{ backgroundColor: primaryColor }}>Browse Menu</Link>
+        <Link to={nav('/')} className="px-5 py-2.5 rounded-xl text-white font-semibold text-sm shadow-lg" style={{ backgroundColor: primaryColor }}>Browse Menu</Link>
       </div>
     );
   }

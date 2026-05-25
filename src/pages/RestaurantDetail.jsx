@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
-import { APP_URL, API_BASE } from '../utils/config';
+import { APP_URL, API_BASE, getCustomerAppUrl } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const RestaurantDetail = () => {
@@ -115,7 +115,7 @@ const RestaurantDetail = () => {
 
   const subInfo = getSubscriptionInfo();
 
-  const customerQrUrl = `${APP_URL}/r/${restaurant.slug}`;
+  const customerQrUrl = getCustomerAppUrl(restaurant.slug);
 
   const handleSave = () => {
     updateRestaurant(id, formData);
