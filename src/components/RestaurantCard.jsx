@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Eye, Pencil, QrCode, Power, Trash2, X, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
-import { APP_URL, getCustomerAppUrl } from '../utils/config';
+import { APP_URL, DOMAIN, getCustomerAppUrl } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const RestaurantCard = ({ restaurant }) => {
@@ -50,6 +50,7 @@ const RestaurantCard = ({ restaurant }) => {
 
   // Generate customer app URL
   const customerUrl = getCustomerAppUrl(restaurant.slug);
+  const ownerUrl = DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`;
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
@@ -165,7 +166,7 @@ const RestaurantCard = ({ restaurant }) => {
       {/* QR Code Modal */}
       {showQR && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowQR(false)}>
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="text-lg font-bold text-gray-800">{restaurant.name}</h3>
@@ -173,24 +174,52 @@ const RestaurantCard = ({ restaurant }) => {
               </div>
               <button onClick={() => setShowQR(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
             </div>
-            <div className="bg-gray-50 rounded-xl p-4 flex justify-center mb-4">
-              <QRCodeSVG value={customerUrl} size={180} level="M" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4">
+                <p className="text-xs font-medium text-gray-500 mb-2">Customer App QR</p>
+                <div className="customer-qr-svg">
+                  <QRCodeSVG value={customerUrl} size={140} level="M" />
+                </div>
+                <a href={customerUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 break-all text-center mt-2 font-mono">{customerUrl}</a>
+                <button
+                  onClick={() => {
+                    const s = document.querySelector('.customer-qr-svg svg');
+                    if (!s) return;
+                    const c = document.createElement('canvas');
+                    const i = new Image();
+                    i.onload = () => { c.width = i.width; c.height = i.height; c.getContext('2d').drawImage(i,0,0); const a = document.createElement('a'); a.download = `customer-qr-${restaurant.slug}.png`; a.href = c.toDataURL(); a.click(); };
+                    i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(s));
+                  }}
+                  className="mt-2 px-3 py-1 bg-[#FF6B35] text-white rounded-lg text-xs flex items-center gap-1"
+                >
+                  <Download size={12} /> Download
+                </button>
+              </div>
+              <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4">
+                <p className="text-xs font-medium text-gray-500 mb-2">Owner Dashboard QR</p>
+                <div className="owner-qr-svg">
+                  <QRCodeSVG value={ownerUrl} size={140} level="M" />
+                </div>
+                <a href={ownerUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 break-all text-center mt-2 font-mono">{ownerUrl}</a>
+                <button
+                  onClick={() => {
+                    const s = document.querySelector('.owner-qr-svg svg');
+                    if (!s) return;
+                    const c = document.createElement('canvas');
+                    const i = new Image();
+                    i.onload = () => { c.width = i.width; c.height = i.height; c.getContext('2d').drawImage(i,0,0); const a = document.createElement('a'); a.download = `owner-qr-${restaurant.slug}.png`; a.href = c.toDataURL(); a.click(); };
+                    i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(s));
+                  }}
+                  className="mt-2 px-3 py-1 bg-[#FF6B35] text-white rounded-lg text-xs flex items-center gap-1"
+                >
+                  <Download size={12} /> Download
+                </button>
+              </div>
             </div>
-            <div className="space-y-2 text-center mb-4">
-              <a href={customerUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 break-all font-mono">{customerUrl}</a>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => { const s = document.querySelector('.restaurant-qr svg'); if (s) { const c = document.createElement('canvas'); const i = new Image(); i.onload = () => { c.width = i.width; c.height = i.height; c.getContext('2d').drawImage(i,0,0); const a = document.createElement('a'); a.download = `qr-${restaurant.slug}.png`; a.href = c.toDataURL(); a.click(); }; i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(s)); } }} className="flex-1 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1"><Download size={14} /> Download</button>
-              <button onClick={() => setShowQR(false)} className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Close</button>
-            </div>
+            <button onClick={() => setShowQR(false)} className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">Close</button>
           </div>
         </div>
       )}
-
-      {/* QR Code SVG for download (hidden) */}
-      <div className="restaurant-qr hidden">
-        <QRCodeSVG value={customerUrl} size={200} level="M" />
-      </div>
     </div>
   );
 };
