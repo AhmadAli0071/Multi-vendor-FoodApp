@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, X, Lock, Power, PowerOff, Trash2 } from 'lucide-react';
+import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, X, Lock, Power, PowerOff, Trash2, QrCode, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useOwner } from '../../context/OwnerContext';
 import { ownerApi } from '../../utils/ownerApi';
+import { APP_URL, DOMAIN } from '../../utils/config';
 import toast from 'react-hot-toast';
 
 const OwnerSettings = () => {
@@ -95,6 +97,54 @@ const OwnerSettings = () => {
           <p className="text-xs text-purple-400 mt-2">Use this ID on the landing page to make subscription payments</p>
         </div>
       )}
+
+      {/* Owner QR Code */}
+      <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">
+        <h2 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+          <QrCode size={16} className="text-[#FF6B35]" /> Owner Panel QR
+        </h2>
+        <p className="text-xs text-gray-500">Scan to open your owner dashboard</p>
+        <div className="bg-gray-50 rounded-xl p-4 flex justify-center">
+          <QRCodeSVG
+            value={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+            size={180}
+            level="M"
+          />
+        </div>
+        <div className="text-center">
+          <a
+            href={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 break-all font-mono"
+          >
+            {DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+          </a>
+        </div>
+        <button
+          onClick={() => {
+            const svg = document.querySelector('.owner-qr-svg svg');
+            if (svg) {
+              const c = document.createElement('canvas');
+              const i = new Image();
+              i.onload = () => {
+                c.width = i.width; c.height = i.height;
+                c.getContext('2d').drawImage(i, 0, 0);
+                const a = document.createElement('a');
+                a.download = `owner-qr-${restaurant.slug || 'panel'}.png`;
+                a.href = c.toDataURL(); a.click();
+              };
+              i.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
+            }
+          }}
+          className="w-full py-2 bg-[#FF6B35] text-white rounded-xl text-sm font-medium flex items-center justify-center gap-1.5"
+        >
+          <Download size={14} /> Download QR
+        </button>
+        <div className="owner-qr-svg hidden">
+          <QRCodeSVG value={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`} size={200} level="M" />
+        </div>
+      </div>
 
       {/* Branding */}
       <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">

@@ -7,7 +7,7 @@ import { APP_URL, getCustomerAppUrl } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const RestaurantCard = ({ restaurant }) => {
-  const { orders, deleteRestaurant } = useAppContext();
+  const { orders, deleteRestaurant, updateRestaurant } = useAppContext();
   const [showQR, setShowQR] = useState(false);
 
   const handleDelete = () => {
@@ -150,11 +150,12 @@ const RestaurantCard = ({ restaurant }) => {
           </Link>
         ) : (
           <button
+            onClick={() => updateRestaurant(restaurant.id, { active: !restaurant.active })}
             className={`p-2 rounded-lg transition-colors ${restaurant.active
                 ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-red-100 text-red-600 hover:bg-red-200'
               }`}
-            title={restaurant.active ? 'Active' : 'Inactive'}
+            title={restaurant.active ? 'Click to deactivate' : 'Click to activate'}
           >
             <Power size={18} />
           </button>
