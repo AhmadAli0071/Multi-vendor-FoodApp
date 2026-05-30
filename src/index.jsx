@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Capture PWA install event as early as possible (before lazy chunks load)
+// Capture PWA install event early (before React mounts)
 window.__deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
