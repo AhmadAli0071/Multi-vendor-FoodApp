@@ -1,34 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 
-let deferredPrompt = null;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
+const getDeferred = () => window.__deferredPrompt;
 
 const InstallPrompt = () => {
-  const [show, setShow] = useState(!!deferredPrompt);
+  const [show, setShow] = useState(!!getDeferred());
 
   useEffect(() => {
-    if (!show && deferredPrompt) {
+    if (!show && getDeferred()) {
       setShow(true);
     }
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    const dp = getDeferred();
+    if (!dp) return;
     try {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
+      dp.prompt();
+      const { outcome } = await dp.userChoice;
       if (outcome === 'accepted') {
         console.log('App installed');
       }
     } catch (err) {
       console.error('Install failed:', err);
     } finally {
-      deferredPrompt = null;
+      window.__deferredPrompt = null;
       setShow(false);
     }
   };
