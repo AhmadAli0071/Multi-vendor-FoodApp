@@ -3,17 +3,18 @@ import { Download, X } from 'lucide-react';
 
 let deferredPrompt = null;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
 const InstallPrompt = () => {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(!!deferredPrompt);
 
   useEffect(() => {
-    const handler = (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
+    if (!show && deferredPrompt) {
       setShow(true);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    }
   }, []);
 
   const handleInstall = async () => {
@@ -35,7 +36,7 @@ const InstallPrompt = () => {
   if (!show) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[99999] p-3 max-w-lg mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-[99999] p-3 max-w-lg mx-auto" style={{bottom: 'env(safe-area-inset-bottom, 0px)'}}>
       <div className="bg-gray-900 text-white rounded-2xl p-4 flex items-center gap-3 shadow-2xl">
         <div className="w-10 h-10 rounded-xl bg-[#FF6B35] flex items-center justify-center text-lg flex-shrink-0">
           🍔
