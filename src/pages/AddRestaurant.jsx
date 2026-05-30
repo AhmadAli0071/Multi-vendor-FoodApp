@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Upload, X } from 'lucide-react';
+import { Plus, Upload, X, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
 import { uploadImage } from '../utils/api';
@@ -35,6 +35,7 @@ const AddRestaurant = () => {
   const [newRestaurant, setNewRestaurant] = useState(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const qrRef = useRef(null);
+  const ownerQrRef = useRef(null);
 
   // Calculate end date when start date or plan changes
   useEffect(() => {
@@ -558,17 +559,14 @@ const AddRestaurant = () => {
               <p className="text-xs text-gray-400 mt-1">Use credentials below to login</p>
             </div>
 
-            {/* QR Code */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm mb-4" ref={qrRef}>
-                <QRCodeSVG
-                  value={customerUrl}
-                  size={200}
-                  level="H"
-                  includeMargin={true}
-                />
-              </div>
-              <div className="flex space-x-3">
+            {/* QR Codes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div className="flex flex-col items-center bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+                <p className="text-xs font-medium text-gray-500 mb-2">Customer App QR</p>
+                <div ref={qrRef}>
+                  <QRCodeSVG value={customerUrl} size={160} level="H" includeMargin={true} />
+                </div>
+                <p className="text-xs text-gray-400 mt-2 break-all text-center">{customerUrl}</p>
                 <button
                   onClick={() => {
                     const svg = qrRef.current?.querySelector('svg');
@@ -578,29 +576,54 @@ const AddRestaurant = () => {
                     const ctx = canvas.getContext('2d');
                     const img = new Image();
                     img.onload = () => {
-                      canvas.width = img.width;
-                      canvas.height = img.height;
+                      canvas.width = img.width; canvas.height = img.height;
                       ctx.drawImage(img, 0, 0);
-                      const pngFile = canvas.toDataURL('image/png');
-                      const downloadLink = document.createElement('a');
-                      downloadLink.download = `qr-${newRestaurant.slug}.png`;
-                      downloadLink.href = `${pngFile}`;
-                      downloadLink.click();
+                      const a = document.createElement('a');
+                      a.download = `customer-qr-${newRestaurant.slug}.png`;
+                      a.href = canvas.toDataURL('image/png'); a.click();
                     };
                     img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
                   }}
-                  className="px-4 py-2 bg-[#FF6B35] text-white rounded-lg hover:bg-[#e55a2b] transition-colors flex items-center space-x-2"
+                  className="mt-2 px-3 py-1.5 bg-[#FF6B35] text-white rounded-lg text-xs hover:bg-[#e55a2b] transition-colors flex items-center gap-1"
                 >
-                  <span>Download QR</span>
+                  <Download size={12} /> Download
                 </button>
+              </div>
+              <div className="flex flex-col items-center bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
+                <p className="text-xs font-medium text-gray-500 mb-2">Owner Dashboard QR</p>
+                <div ref={ownerQrRef}>
+                  <QRCodeSVG value={ownerUrl} size={160} level="H" includeMargin={true} />
+                </div>
+                <p className="text-xs text-gray-400 mt-2 break-all text-center">{ownerUrl}</p>
                 <button
-                  onClick={() => window.print()}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+                  onClick={() => {
+                    const svg = ownerQrRef.current?.querySelector('svg');
+                    if (!svg) return;
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = () => {
+                      canvas.width = img.width; canvas.height = img.height;
+                      ctx.drawImage(img, 0, 0);
+                      const a = document.createElement('a');
+                      a.download = `owner-qr-${newRestaurant.slug}.png`;
+                      a.href = canvas.toDataURL('image/png'); a.click();
+                    };
+                    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+                  }}
+                  className="mt-2 px-3 py-1.5 bg-[#FF6B35] text-white rounded-lg text-xs hover:bg-[#e55a2b] transition-colors flex items-center gap-1"
                 >
-                  <span>Print QR</span>
+                  <Download size={12} /> Download
                 </button>
               </div>
             </div>
+            <button
+              onClick={() => window.print()}
+              className="w-full mb-6 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+            >
+              <Download size={14} /> Print Both QRs
+            </button>
 
             {/* Login Credentials */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
