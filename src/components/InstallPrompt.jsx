@@ -1,33 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Download, X } from 'lucide-react';
 
-const getDeferred = () => window.__deferredPrompt;
-
 const InstallPrompt = () => {
-  const [show, setShow] = useState(!!getDeferred());
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (!show && getDeferred()) {
+    const handler = (e) => {
+      e.preventDefault();
+      window.__deferredPrompt = e;
+      setShow(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    if (window.__deferredPrompt) {
       setShow(true);
     }
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  const handleInstall = async () => {
-    const dp = getDeferred();
+  const handleInstall = useCallback(() => {
+    const dp = window.__deferredPrompt;
     if (!dp) return;
-    try {
-      dp.prompt();
-      const { outcome } = await dp.userChoice;
-      if (outcome === 'accepted') {
-        console.log('App installed');
-      }
-    } catch (err) {
-      console.error('Install failed:', err);
-    } finally {
+    dp.prompt();
+    dp.userChoice.then(() => {
       window.__deferredPrompt = null;
       setShow(false);
-    }
-  };
+    }).catch(() => {
+      window.__deferredPrompt = null;
+      setShow(false);
+    });
+  }, []);
 
   if (!show) return null;
 
@@ -43,12 +44,12 @@ const InstallPrompt = () => {
         </div>
         <button
           onClick={handleInstall}
-          className="px-4 py-2.5 bg-[#FF6B35] rounded-lg text-xs font-bold flex items-center gap-1 flex-shrink-0"
+          className="px-4 py-2.5 bg-[#FF6B35] rounded-lg text-xs font-bold flex items-center gap-1 flex-shrink-0 cursor-pointer active:scale-95 transition-transform"
         >
           <Download size={14} />
           Install
         </button>
-        <button onClick={() => setShow(false)} className="p-1 text-gray-500 hover:text-white flex-shrink-0">
+        <button onClick={() => setShow(false)} className="p-1 text-gray-500 hover:text-white flex-shrink-0 cursor-pointer">
           <X size={16} />
         </button>
       </div>
