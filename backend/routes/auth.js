@@ -16,6 +16,7 @@ router.post('/login', async (req, res, next) => {
     if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '30d' });
     let restaurant = null;
     if (user.role === 'restaurant' && user.restaurant_id) {
       restaurant = await db.findRestaurantById(user.restaurant_id);
