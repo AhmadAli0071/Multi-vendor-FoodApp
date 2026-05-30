@@ -60,6 +60,9 @@ export const OwnerProvider = ({ children }) => {
       if (d.success && d.data) {
         setRestaurant(d.data);
         localStorage.setItem('owner_restaurant', JSON.stringify(d.data));
+      } else if (d.data?.active === false || d.message?.toLowerCase().includes('inactive') || d.message?.toLowerCase().includes('deactivated')) {
+        logout();
+        toast.error('Your subscription has been deactivated by admin.');
       }
     }).catch(() => {});
   }, [isLoggedIn]);

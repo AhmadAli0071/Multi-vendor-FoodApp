@@ -17,6 +17,9 @@ router.get('/me', protect, async (req, res, next) => {
     if (!restaurant) {
       return res.status(404).json({ success: false, message: 'Restaurant not found' });
     }
+    if (!restaurant.active) {
+      return res.status(403).json({ success: false, message: 'Your subscription is inactive. Please contact admin.', data: { active: false } });
+    }
 
     res.json({
       success: true,

@@ -16,10 +16,12 @@ router.post('/login', async (req, res, next) => {
     if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '30d' });
     let restaurant = null;
     if (user.role === 'restaurant' && user.restaurant_id) {
       restaurant = await db.findRestaurantById(user.restaurant_id);
+      if (restaurant && !restaurant.active) {
+        return res.status(403).json({ success: false, message: 'Your subscription has been deactivated. Please contact admin.' });
+      }
     }
     res.status(200).json({ success: true, token, user: { id: user.id, email: user.email, role: user.role, restaurant: restaurant ? { id: restaurant.id, name: restaurant.name, email: restaurant.email, plan: restaurant.plan, active: restaurant.active } : null } });
   } catch (error) { next(error); }
