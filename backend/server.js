@@ -134,6 +134,7 @@ function getSubdomain(hostname) {
 
 // Dynamic manifest.json based on subdomain (for separate PWA apps)
 app.get('/manifest.json', (req, res) => {
+  const nameParam = req.query.name;
   const subdomain = getSubdomain(req.hostname);
   const isOwner = subdomain === 'owner';
   const isCustomer = subdomain && subdomain !== 'admin' && subdomain !== 'owner' && subdomain !== 'www';
@@ -141,7 +142,10 @@ app.get('/manifest.json', (req, res) => {
   let name = 'FoodApp Admin';
   let shortName = 'FoodApp';
 
-  if (isOwner) {
+  if (nameParam) {
+    name = nameParam;
+    shortName = nameParam.length > 12 ? nameParam.substring(0, 12) + '..' : nameParam;
+  } else if (isOwner) {
     name = 'FoodApp Owner';
     shortName = 'Owner';
   } else if (isCustomer) {
