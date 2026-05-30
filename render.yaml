@@ -5,6 +5,7 @@ services:
     region: singapore
     buildCommand: npm run render-build
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -27,6 +28,7 @@ services:
     region: singapore
     buildCommand: npm run render-build
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -49,6 +51,7 @@ services:
     region: singapore
     buildCommand: npm run render-build
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
