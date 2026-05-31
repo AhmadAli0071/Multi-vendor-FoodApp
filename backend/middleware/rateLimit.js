@@ -18,11 +18,9 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Upload rate limit: 10 uploads per hour per IP
+// Upload rate limit: 50 uploads per hour per IP
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 10,
+  max: 50,
   message: { success: false, message: 'Too many uploads, please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
 });

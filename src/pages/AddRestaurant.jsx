@@ -119,7 +119,7 @@ const AddRestaurant = () => {
       primaryColor: formData.primaryColor,
       secondaryColor: formData.secondaryColor,
       fontFamily: formData.fontFamily,
-      logo: formData.logoPreview,
+      logo: formData.logo || formData.logoPreview,
       slug,
       deliveryAvailable: formData.deliveryAvailable,
       pickupAvailable: formData.pickupAvailable,

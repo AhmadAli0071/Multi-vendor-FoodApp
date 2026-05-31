@@ -33,13 +33,21 @@ async function uploadToCloudinary(file) {
     const stream = cloudinary.uploader.upload_stream(
       { folder: 'foodapp', resource_type: 'image' },
       (error, result) => {
-        if (error) reject(error);
-        else resolve(result.secure_url);
+        if (error) {
+          console.error('[Cloudinary] Upload error:', error);
+          reject(error);
+        } else {
+          console.log('[Cloudinary] Upload success:', result.secure_url);
+          resolve(result.secure_url);
+        }
       }
     );
     stream.end(file.buffer);
   });
 }
+
+// Also export for use in other routes (payment proofs, etc.)
+export { uploadToCloudinary };
 
 router.post('/public', upload.single('image'), async (req, res, next) => {
   try {

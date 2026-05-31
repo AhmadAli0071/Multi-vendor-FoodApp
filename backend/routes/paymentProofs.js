@@ -2,6 +2,7 @@ import express from 'express';
 import { protect } from '../middleware/auth.js';
 import PaymentProof from '../models/PaymentProof.js';
 import { db } from '../config/database.js';
+import { uploadToCloudinary } from './upload.js';
 
 const router = express.Router();
 
@@ -66,6 +67,18 @@ router.post('/public', async (req, res) => {
     const price = planPrices[plan || restaurant.plan] || 5999;
     const monthsToAdd = Math.max(1, Math.floor(parseFloat(amount) / price));
 
+    // Upload base64 image to Cloudinary
+    let imageUrl = image;
+    if (image.startsWith('data:')) {
+      const base64Data = image.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const mimeMatch = image.match(/^data:([^;]+);/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+      const ext = mimeType.split('/')[1] || 'png';
+      const fakeFile = { buffer, mimetype: mimeType, originalname: `payment-${Date.now()}.${ext}`, size: buffer.length };
+      imageUrl = await uploadToCloudinary(fakeFile);
+    }
+
     await PaymentProof.create({
       restaurant_id: restaurant.id,
       restaurant_name: restaurant.name,
@@ -73,7 +86,7 @@ router.post('/public', async (req, res) => {
       amount: parseFloat(amount),
       plan: plan || restaurant.plan,
       payment_method: payment_method || '',
-      image,
+      image: imageUrl,
       status: 'pending',
       months_to_add: monthsToAdd
     });
@@ -83,6 +96,7 @@ router.post('/public', async (req, res) => {
       message: 'Payment proof submitted! Admin will verify and update your subscription.'
     });
   } catch (error) {
+    console.error('[PaymentProof] Upload error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -107,12 +121,24 @@ router.post('/', protect, async (req, res, next) => {
     const price = planPrices[plan || restaurant.plan] || 5999;
     const monthsToAdd = Math.max(1, Math.floor(parseFloat(amount) / price));
 
+    // Upload base64 image to Cloudinary
+    let imageUrl = image;
+    if (image.startsWith('data:')) {
+      const base64Data = image.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const mimeMatch = image.match(/^data:([^;]+);/);
+      const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+      const ext = mimeType.split('/')[1] || 'png';
+      const fakeFile = { buffer, mimetype: mimeType, originalname: `payment-${Date.now()}.${ext}`, size: buffer.length };
+      imageUrl = await uploadToCloudinary(fakeFile);
+    }
+
     await PaymentProof.create({
       restaurant_id: restaurant.id,
       restaurant_name: restaurant.name,
       amount: parseFloat(amount),
       plan: plan || restaurant.plan,
-      image,
+      image: imageUrl,
       status: 'pending',
       months_to_add: monthsToAdd
     });
