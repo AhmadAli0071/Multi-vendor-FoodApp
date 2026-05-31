@@ -89,9 +89,9 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "https:", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https://foodapp-owner.onrender.com", "https://foodapp-admin-f13g.onrender.com"],
+      imgSrc: ["'self'", "data:", "https://foodapp-owner.onrender.com", "https://foodapp-admin-f13g.onrender.com", "https://res.cloudinary.com"],
       fontSrc: ["'self'", "https:", "data:"],
-      connectSrc: ["'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://foodapp-owner.onrender.com", "https://foodapp-admin-f13g.onrender.com"],
+      connectSrc: ["'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://foodapp-owner.onrender.com", "https://foodapp-admin-f13g.onrender.com", "https://res.cloudinary.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     }
