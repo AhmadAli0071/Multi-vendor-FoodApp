@@ -140,19 +140,22 @@ app.get('/manifest.json', (req, res) => {
 
   let name = 'FoodApp Admin';
   let shortName = 'FoodApp';
+  let startUrl = '/';
 
   if (isOwner) {
     name = 'FoodApp Owner';
     shortName = 'Owner';
+    startUrl = '/owner';
   } else if (isCustomer) {
     name = subdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     shortName = subdomain.length > 10 ? subdomain.substring(0, 10) + '..' : subdomain;
+    startUrl = '/';
   }
 
   res.json({
     name, short_name: shortName,
     description: `FoodApp - ${name}`,
-    start_url: '/', display: 'standalone',
+    start_url: startUrl, display: 'standalone',
     background_color: '#FFFFFF', theme_color: '#FF6B35',
     orientation: 'portrait-primary',
     icons: [

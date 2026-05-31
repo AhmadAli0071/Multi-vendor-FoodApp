@@ -4,8 +4,6 @@ import { useAppContext } from '../context/AppContext';
 import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 
-const API = API_BASE;
-
 const Subscriptions = () => {
   const { restaurants, renewSubscription, updateRestaurant } = useAppContext();
   const [showRenewModal, setShowRenewModal] = useState(false);
@@ -21,7 +19,7 @@ const Subscriptions = () => {
   const fetchProofs = async () => {
     try {
       const t = localStorage.getItem('admin_token');
-      const res = await fetch(`${API}/payment-proofs/pending`, { headers: { 'Authorization': `Bearer ${t}` } });
+      const res = await fetch(`${API_BASE}/payment-proofs/pending`, { headers: { 'Authorization': `Bearer ${t}` } });
       const data = await res.json();
       if (data.success) setPaymentProofs(data.proofs);
     } catch (err) { /* */ }
@@ -29,7 +27,7 @@ const Subscriptions = () => {
   const handleApproveProof = async (proofId) => {
     try {
       const t = localStorage.getItem('admin_token');
-      const r = await fetch(`${API}/payment-proofs/${proofId}/approve`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` } });
+      const r = await fetch(`${API_BASE}/payment-proofs/${proofId}/approve`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` } });
       const d = await r.json();
       if (d.success) { toast.success(d.message); fetchProofs(); } else throw new Error(d.message);
     } catch (err) { toast.error(err.message || 'Failed'); }
@@ -37,18 +35,20 @@ const Subscriptions = () => {
   const handleRejectProof = async (proofId) => {
     try {
       const t = localStorage.getItem('admin_token');
-      const r = await fetch(`${API}/payment-proofs/${proofId}/reject`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` }, body: JSON.stringify({ note: 'Rejected' }) });
+      const r = await fetch(`${API_BASE}/payment-proofs/${proofId}/reject`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` }, body: JSON.stringify({ note: 'Rejected' }) });
       const d = await r.json();
       if (d.success) { toast.success('Rejected'); fetchProofs(); } else throw new Error(d.message);
     } catch (err) { toast.error(err.message || 'Failed'); }
   };
   useEffect(() => { fetchProofs(); }, []);
 
+    const [imgErrors, setImgErrors] = useState({});
+
   const getImageUrl = (url) => {
     if (!url) return '';
     if (url.startsWith('data:')) return url;
     if (url.startsWith('http')) return url;
-    const base = API_BASE.replace('/api', '');
+    const base = API_BASE.replace(/\/api$/, '');
     return `${base}${url}`;
   };
 
@@ -111,8 +111,13 @@ const Subscriptions = () => {
                     <p className="text-xs text-gray-400">Approved: ~{proof.months_to_add} month(s)</p>
                   </div>
                 </div>
-                {proof.image && (
-                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-64 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} />
+                {proof.image && !imgErrors[proof._id] && (
+                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-64 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} onError={() => setImgErrors(p => ({ ...p, [proof._id]: true }))} />
+                )}
+                {proof.image && imgErrors[proof._id] && (
+                  <div className="w-full rounded-lg border max-h-64 mb-3 bg-gray-100 flex items-center justify-center cursor-pointer" onClick={() => setPreviewImage(getImageUrl(proof.image))}>
+                    <Image size={32} className="text-gray-300" />
+                  </div>
                 )}
                 <div className="flex gap-2">
                   <button onClick={() => handleApproveProof(proof._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-green-700">

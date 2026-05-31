@@ -14,6 +14,14 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true
       },
+      '/sw.js': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/manifest.json': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
       '/socket.io': {
         target: 'http://localhost:5000',
         changeOrigin: true,
