@@ -90,9 +90,9 @@ app.set('trust proxy', 1);
 // CORS
 app.use(cors(corsOptions));
 
-// Body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parser (increased limit for base64 images)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Validation middleware
 import { validationResult } from 'express-validator';
