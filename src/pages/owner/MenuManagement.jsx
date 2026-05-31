@@ -44,7 +44,7 @@ const MenuManagement = () => {
   const handleSaveCategory = () => {
     if (!catForm.name.trim()) return toast.error('Category name is required');
     if (editingCat) {
-      updateCategory(editingCat.id, catForm);
+      updateCategory(editingCat._id, catForm);
       toast.success('Category updated!');
     } else {
       addCategory(catForm);
@@ -129,8 +129,8 @@ const MenuManagement = () => {
       ) : (
         <div className="space-y-2">
           {filteredCategories.map(cat => (
-            <div key={cat.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between p-3 cursor-pointer active:bg-gray-50" onClick={() => setExpandedCat(expandedCat === cat.id ? null : cat.id)}>
+            <div key={cat._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between p-3 cursor-pointer active:bg-gray-50" onClick={() => setExpandedCat(expandedCat === cat._id ? null : cat._id)}>
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{cat.icon || '🍽️'}</span>
                   <div>
@@ -142,21 +142,21 @@ const MenuManagement = () => {
                   <button onClick={(e) => { e.stopPropagation(); openCatModal(cat); }} className="p-1.5 text-gray-400 active:text-[#FF6B35]">
                     <Edit3 size={14} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat.id, cat.name); }} className="p-1.5 text-gray-400 active:text-red-500">
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat._id, cat.name); }} className="p-1.5 text-gray-400 active:text-red-500">
                     <Trash2 size={14} />
                   </button>
-                  {expandedCat === cat.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+                  {expandedCat === cat._id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
                 </div>
               </div>
 
-              {expandedCat === cat.id && (
+              {expandedCat === cat._id && (
                 <div className="border-t border-gray-100">
                   {cat.items.length === 0 ? (
                     <div className="p-4 text-center">
                       <p className="text-xs text-gray-400 mb-3">No items in this category</p>
-                      <button onClick={() => openItemModal(cat.id)} className="px-4 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium flex items-center gap-1.5 mx-auto">
-                        <Plus size={14} /> Add Item
-                      </button>
+                        <button onClick={() => openItemModal(cat._id)} className="px-4 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-medium flex items-center gap-1.5 mx-auto">
+                          <Plus size={14} /> Add Item
+                        </button>
                     </div>
                   ) : (
                     <>
@@ -178,10 +178,10 @@ const MenuManagement = () => {
                                 <p className="text-xs text-gray-400 truncate">{item.description}</p>
                               </div>
                               <div className="text-sm font-bold text-[#FF6B35] flex-shrink-0 whitespace-nowrap">PKR {Number(item.price).toLocaleString()}</div>
-                              <button onClick={(e) => { e.stopPropagation(); openItemModal(cat.id, item); }} className="p-2 text-gray-400 hover:text-[#FF6B35]">
+                              <button onClick={(e) => { e.stopPropagation(); openItemModal(cat._id, item); }} className="p-2 text-gray-400 hover:text-[#FF6B35]">
                                 <Edit3 size={14} />
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(cat.id, item._id || item.id); }} className="p-2 text-gray-400 hover:text-red-500">
+                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(cat._id, item._id || item.id); }} className="p-2 text-gray-400 hover:text-red-500">
                                 <Trash2 size={14} />
                               </button>
                             </div>
@@ -189,7 +189,7 @@ const MenuManagement = () => {
                         ))
                       )}
                       <div className="px-3 py-2 border-t border-gray-100">
-                        <button onClick={() => openItemModal(cat.id)} className="w-full py-1.5 text-[#FF6B35] text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-orange-50 rounded-lg active:bg-orange-100 transition-colors">
+                        <button onClick={() => openItemModal(cat._id)} className="w-full py-1.5 text-[#FF6B35] text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-orange-50 rounded-lg active:bg-orange-100 transition-colors">
                           <Plus size={14} /> Add Item
                         </button>
                       </div>

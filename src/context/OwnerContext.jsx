@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { API_BASE, WS_URL } from '../utils/config.js';
+import toast from 'react-hot-toast';
 
 const OwnerContext = createContext();
 
@@ -243,7 +244,7 @@ export const OwnerProvider = ({ children }) => {
   const updateCategory = (categoryId, updated) => {
     setMenu(prev => ({
       ...prev,
-      categories: (prev.categories || []).map(cat => cat._id === categoryId ? { ...cat, ...updated } : cat)
+      categories: (prev.categories || []).map(cat => (cat._id === categoryId || cat.id === categoryId) ? { ...cat, ...updated } : cat)
     }));
     syncMenu();
   };
@@ -251,7 +252,7 @@ export const OwnerProvider = ({ children }) => {
   const deleteCategory = (categoryId) => {
     setMenu(prev => ({
       ...prev,
-      categories: (prev.categories || []).filter(cat => cat._id !== categoryId)
+      categories: (prev.categories || []).filter(cat => cat._id !== categoryId && cat.id !== categoryId)
     }));
     syncMenu();
   };
@@ -261,7 +262,7 @@ export const OwnerProvider = ({ children }) => {
     setMenu(prev => ({
       ...prev,
       categories: (prev.categories || []).map(cat =>
-        cat._id === categoryId
+        (cat._id === categoryId || cat.id === categoryId)
           ? { ...cat, items: [...(cat.items || []), newItem] }
           : cat
       )
@@ -274,7 +275,7 @@ export const OwnerProvider = ({ children }) => {
       ...prev,
       categories: (prev.categories || []).map(cat => ({
         ...cat,
-        items: (cat.items || []).map(item => item._id === itemId ? { ...item, ...updatedItem } : item)
+        items: (cat.items || []).map(item => (item._id === itemId || item.id === itemId) ? { ...item, ...updatedItem } : item)
       }))
     }));
     syncMenu();
@@ -285,7 +286,7 @@ export const OwnerProvider = ({ children }) => {
       ...prev,
       categories: (prev.categories || []).map(cat => ({
         ...cat,
-        items: (cat.items || []).filter(item => item._id !== itemId)
+        items: (cat.items || []).filter(item => item._id !== itemId && item.id !== itemId)
       }))
     }));
     syncMenu();

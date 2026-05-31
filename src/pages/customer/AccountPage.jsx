@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { Mail, Phone, Clock, Package, ShoppingBag, ChevronRight, MapPin } from 'lucide-react';
 
