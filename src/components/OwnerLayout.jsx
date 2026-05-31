@@ -47,7 +47,7 @@ const OwnerLayout = () => {
   };
 
   const navItems = [
-    { to: `${base}/`, icon: LayoutDashboard, label: 'Home' },
+    { to: base || '/', icon: LayoutDashboard, label: 'Home' },
     { to: `${base}/menu`, icon: UtensilsCrossed, label: 'Menu' },
     { to: `${base}/orders`, icon: ClipboardList, label: 'Orders' },
     { to: `${base}/settings`, icon: Settings, label: 'Settings' }
@@ -131,7 +131,7 @@ const OwnerLayout = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === `${base}/`}
+              end={item.to === (base || '/')}
               className={linkClasses}
             >
               <item.icon size={22} strokeWidth={1.8} />
