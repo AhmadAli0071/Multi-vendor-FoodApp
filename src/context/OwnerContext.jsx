@@ -279,11 +279,30 @@ export const OwnerProvider = ({ children }) => {
     syncMenu();
   };
 
-  const deleteCategory = (categoryId) => {
+  const deleteCategory = async (categoryId) => {
     setMenu(prev => ({
       ...prev,
       categories: (prev.categories || []).filter(cat => cat._id !== categoryId && cat.id !== categoryId)
     }));
+    if (apiAvailable && restaurant) {
+      const token = localStorage.getItem('owner_token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_BASE}/menu/categories/${categoryId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          setApiAvailable(false);
+          syncMenu();
+          return;
+        }
+      } catch {
+        setApiAvailable(false);
+        syncMenu();
+        return;
+      }
+    }
     syncMenu();
   };
 
@@ -311,7 +330,7 @@ export const OwnerProvider = ({ children }) => {
     syncMenu();
   };
 
-  const deleteMenuItem = (itemId) => {
+  const deleteMenuItem = async (itemId) => {
     setMenu(prev => ({
       ...prev,
       categories: (prev.categories || []).map(cat => ({
@@ -319,6 +338,25 @@ export const OwnerProvider = ({ children }) => {
         items: (cat.items || []).filter(item => item._id !== itemId && item.id !== itemId)
       }))
     }));
+    if (apiAvailable && restaurant) {
+      const token = localStorage.getItem('owner_token');
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_BASE}/menu/items/${itemId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) {
+          setApiAvailable(false);
+          syncMenu();
+          return;
+        }
+      } catch {
+        setApiAvailable(false);
+        syncMenu();
+        return;
+      }
+    }
     syncMenu();
   };
 
