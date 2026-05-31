@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AppProvider } from './context/AppContext';
 import { OwnerProvider } from './context/OwnerContext';
@@ -67,6 +67,9 @@ function OwnerSubdomainRoutes() {
     <OwnerProvider>
       <Suspense fallback={<PageLoader />}>
         <Routes>
+          <Route path="/owner/login" element={<Navigate to="/login" replace />} />
+          <Route path="/owner" element={<Navigate to="/" replace />} />
+          <Route path="/owner/*" element={<Navigate to="/" replace />} />
           <Route path="/login" element={<OwnerLogin />} />
           <Route path="/" element={<OwnerLayout />}>
             <Route index element={<OwnerDashboard />} />
