@@ -122,9 +122,24 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'FoodApp Backend Running', timestamp: new Date().toISOString() });
 });
 
-// Utility to detect subdomain from host
+// Utility to detect subdomain or Render service name from host
+function getRenderServiceName(hostname) {
+  if (!hostname) return null;
+  if (hostname.endsWith('.onrender.com')) {
+    return hostname.split('.')[0];
+  }
+  return null;
+}
+
 function getSubdomain(hostname) {
   if (!hostname) return null;
+  const renderName = getRenderServiceName(hostname);
+  if (renderName) {
+    if (renderName.includes('admin')) return 'admin';
+    if (renderName.includes('owner')) return 'owner';
+    if (renderName.includes('landing')) return 'landing';
+    return 'customer';
+  }
   const parts = hostname.split('.');
   if (parts.length >= 3) {
     return parts[0];
@@ -135,10 +150,11 @@ function getSubdomain(hostname) {
 // Dynamic manifest.json based on subdomain (for separate PWA apps)
 app.get('/manifest.json', (req, res) => {
   const subdomain = getSubdomain(req.hostname);
+  const isAdmin = subdomain === 'admin';
   const isOwner = subdomain === 'owner';
-  const isCustomer = subdomain && subdomain !== 'admin' && subdomain !== 'owner' && subdomain !== 'www';
+  const isCustomer = subdomain === 'customer';
 
-  let name = 'FoodApp Admin';
+  let name = 'FoodApp';
   let shortName = 'FoodApp';
   let startUrl = '/';
 
@@ -146,10 +162,15 @@ app.get('/manifest.json', (req, res) => {
     name = 'FoodApp Owner';
     shortName = 'Owner';
     startUrl = '/owner';
+  } else if (isAdmin) {
+    name = 'FoodApp Admin';
+    shortName = 'Admin';
   } else if (isCustomer) {
-    name = subdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    shortName = subdomain.length > 10 ? subdomain.substring(0, 10) + '..' : subdomain;
-    startUrl = '/';
+    const originalSubdomain = getRenderServiceName(req.hostname) || getSubdomain(req.hostname);
+    if (originalSubdomain) {
+      name = originalSubdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      shortName = name.length > 12 ? name.substring(0, 12) : name;
+    }
   }
 
   res.json({
