@@ -19,23 +19,23 @@ const Dashboard = () => {
     return r ? r.name : 'Unknown';
   };
 
-  const expiringRestaurants = restaurants.filter(r => {
-    if (!r.active) return false;
-    if (!r.subscriptionEnd) return false;
+  const getSubStatus = (r) => {
+    if (!r.active) return 'inactive';
+    if (!r.subscriptionEnd) return 'no-sub';
     const endDate = new Date(r.subscriptionEnd);
-    if (isNaN(endDate.getTime())) return false;
+    if (isNaN(endDate.getTime())) return 'no-sub';
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const sevenDaysFromNow = new Date(today); sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    return endDate >= today && endDate <= sevenDaysFromNow;
-  });
+    if (endDate < today) return 'expired';
+    if (endDate <= sevenDaysFromNow) return 'expiring';
+    return 'active';
+  };
 
-  const expiredRestaurants = restaurants.filter(r => {
-    if (!r.subscriptionEnd) return false;
-    const endDate = new Date(r.subscriptionEnd);
-    if (isNaN(endDate.getTime())) return false;
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    return endDate < today;
-  });
+  const expiringRestaurants = restaurants.filter(r => getSubStatus(r) === 'expiring');
+  const expiredRestaurants = restaurants.filter(r => getSubStatus(r) === 'expired');
+  const activeSubRestaurants = restaurants.filter(r => getSubStatus(r) === 'active');
+  const inactiveRestaurants = restaurants.filter(r => getSubStatus(r) === 'inactive');
+  const noSubRestaurants = restaurants.filter(r => getSubStatus(r) === 'no-sub');
 
   const recentOrders = [...orders]
     .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
@@ -215,46 +215,83 @@ const Dashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-6 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">Subscription Alerts</h2>
-            <AlertTriangle className={expiringRestaurants.length > 0 || expiredRestaurants.length > 0 ? 'text-yellow-500' : 'text-gray-300'} size={20} />
+            <AlertTriangle className={expiringRestaurants.length > 0 || expiredRestaurants.length > 0 || inactiveRestaurants.length > 0 ? 'text-yellow-500' : 'text-gray-300'} size={20} />
           </div>
           <div className="p-4">
-            {expiringRestaurants.length > 0 || expiredRestaurants.length > 0 ? (
-              <div className="space-y-2">
-                {expiringRestaurants.map(r => {
-                  const daysLeft = Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000);
-                  return (
-                    <div key={r.id} className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
-                          <p className="text-xs text-gray-500 mt-0.5">{daysLeft} days left</p>
-                        </div>
-                        <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-medium">Expiring</span>
-                      </div>
+            <div className="flex gap-2 mb-4 flex-wrap">
+              <span className="px-2.5 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-medium">{activeSubRestaurants.length} Active</span>
+              <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-medium">{expiringRestaurants.length} Expiring</span>
+              <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-medium">{expiredRestaurants.length + inactiveRestaurants.length} Inactive</span>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {restaurants.length === 0 && (
+                <div className="text-center py-6 text-gray-400 text-sm">No restaurants found</div>
+              )}
+              {noSubRestaurants.map(r => (
+                <div key={r.id} className="p-3 border border-gray-200 bg-gray-50 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                      <p className="text-xs text-gray-400 mt-0.5">No subscription set</p>
                     </div>
-                  );
-                })}
-                {expiredRestaurants.map(r => {
-                  const daysOver = Math.abs(Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000));
-                  return (
-                    <div key={r.id} className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
-                          <p className="text-xs text-red-500 mt-0.5">{daysOver} days overdue</p>
-                        </div>
-                        <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-medium">Expired</span>
+                    <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs font-medium">No Plan</span>
+                  </div>
+                </div>
+              ))}
+              {activeSubRestaurants.map(r => {
+                const daysLeft = Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000);
+                return (
+                  <div key={r.id} className="p-3 border border-green-200 bg-green-50 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                        <p className="text-xs text-green-600 mt-0.5">{daysLeft} days remaining</p>
                       </div>
+                      <span className="px-2 py-1 bg-green-200 text-green-700 rounded text-xs font-medium">{r.plan || 'Active'}</span>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <div className="text-gray-300 text-lg mb-1">✓</div>
-                <p className="text-sm text-gray-500">All subscriptions active</p>
-              </div>
-            )}
+                  </div>
+                );
+              })}
+              {expiringRestaurants.map(r => {
+                const daysLeft = Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000);
+                return (
+                  <div key={r.id} className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                        <p className="text-xs text-yellow-600 mt-0.5">{daysLeft} days left</p>
+                      </div>
+                      <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-medium">Expiring</span>
+                    </div>
+                  </div>
+                );
+              })}
+              {expiredRestaurants.map(r => {
+                const daysOver = Math.abs(Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000));
+                return (
+                  <div key={r.id} className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                        <p className="text-xs text-red-500 mt-0.5">{daysOver} days overdue</p>
+                      </div>
+                      <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-medium">Expired</span>
+                    </div>
+                  </div>
+                );
+              })}
+              {inactiveRestaurants.map(r => (
+                <div key={r.id} className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                      <p className="text-xs text-red-500 mt-0.5">Manually deactivated</p>
+                    </div>
+                    <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-medium">Inactive</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
