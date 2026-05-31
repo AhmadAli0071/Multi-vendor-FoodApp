@@ -152,6 +152,12 @@ const OwnerOrders = () => {
                         </div>
                       )}
                       <p className="text-xs text-gray-400">{order.type || 'Delivery'} · {formatDate(order.createdAt)}</p>
+                      {order.notes && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-gray-400 mt-0.5 flex-shrink-0">📝</span>
+                          <p className="text-xs text-gray-500 italic">{order.notes}</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Items */}

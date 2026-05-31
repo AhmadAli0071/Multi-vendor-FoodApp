@@ -181,7 +181,7 @@ const MenuManagement = () => {
                               <button onClick={(e) => { e.stopPropagation(); openItemModal(cat._id, item); }} className="p-2 text-gray-400 hover:text-[#FF6B35]">
                                 <Edit3 size={14} />
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(cat._id, item._id || item.id); }} className="p-2 text-gray-400 hover:text-red-500">
+                              <button onClick={(e) => { e.stopPropagation(); deleteMenuItem(item._id || item.id); }} className="p-2 text-gray-400 hover:text-red-500">
                                 <Trash2 size={14} />
                               </button>
                             </div>

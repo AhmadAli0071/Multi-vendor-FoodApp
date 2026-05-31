@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
-import { Minus, Plus, ShoppingCart, Clock, Flame, ChevronLeft } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Clock, Flame, ChevronLeft, ArrowRight } from 'lucide-react';
 
 const FoodDetail = () => {
   const { itemId } = useParams();
@@ -13,6 +13,55 @@ const FoodDetail = () => {
   const item = allItems.find(i => i.id === itemId);
 
   const [quantity, setQuantity] = useState(1);
+  const [sliding, setSliding] = useState(false);
+  const [slidePercent, setSlidePercent] = useState(0);
+  const sliderRef = useRef(null);
+  const startX = useRef(0);
+  const currentX = useRef(0);
+
+  const handleTouchStart = (e) => {
+    startX.current = e.touches[0].clientX;
+    setSliding(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!sliding) return;
+    const rect = sliderRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const dx = e.touches[0].clientX - startX.current;
+    const pct = Math.min(100, Math.max(0, (dx / rect.width) * 100));
+    setSlidePercent(pct);
+  };
+
+  const handleTouchEnd = () => {
+    if (slidePercent > 80) {
+      handleAddToCart();
+    }
+    setSliding(false);
+    setSlidePercent(0);
+  };
+
+  const handleMouseDown = (e) => {
+    startX.current = e.clientX;
+    setSliding(true);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!sliding) return;
+    const rect = sliderRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const dx = e.clientX - startX.current;
+    const pct = Math.min(100, Math.max(0, (dx / rect.width) * 100));
+    setSlidePercent(pct);
+  };
+
+  const handleMouseUp = () => {
+    if (slidePercent > 80) {
+      handleAddToCart();
+    }
+    setSliding(false);
+    setSlidePercent(0);
+  };
 
   if (!item) {
     return (
@@ -51,7 +100,11 @@ const FoodDetail = () => {
           <div className="absolute top-10 right-10 w-40 h-40 rounded-full bg-white" />
           <div className="absolute bottom-0 left-5 w-32 h-32 rounded-full bg-white" />
         </div>
-        <span className="text-[100px] relative z-10 drop-shadow-xl">{item.image || '🍽️'}</span>
+        {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/uploads')) ? (
+          <img src={item.image} alt={item.name} className="w-full h-full object-cover relative z-10" />
+        ) : (
+          <span className="text-[100px] relative z-10 drop-shadow-xl">{item.image || '🍽️'}</span>
+        )}
         {item.popular && (
           <div className="absolute top-4 right-4 bg-white text-pink-500 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-lg z-10">
             <Flame size={12} /> Popular
@@ -114,19 +167,46 @@ const FoodDetail = () => {
 
       {/* Sticky Bottom Bar */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-lg mx-auto safe-bottom">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-3">
           <div className="flex-1">
             <p className="text-[11px] text-gray-400">{quantity} item{quantity > 1 ? 's' : ''}</p>
             <p className="text-lg font-extrabold" style={{ color: primaryColor }}>Rs. {item.price * quantity}</p>
           </div>
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition-all"
-            style={{ backgroundColor: primaryColor }}
+          <div className="text-right">
+            <p className="text-[11px] text-gray-400">Total</p>
+            <p className="text-lg font-extrabold" style={{ color: primaryColor }}>Rs. {item.price * quantity}</p>
+          </div>
+        </div>
+        <div
+          ref={sliderRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className="relative w-full h-14 rounded-2xl overflow-hidden select-none cursor-grab active:cursor-grabbing"
+          style={{ backgroundColor: primaryColor + '20' }}
+        >
+          <div
+            className="absolute inset-y-0 left-0 rounded-2xl flex items-center justify-center transition-none"
+            style={{ width: `${slidePercent}%`, backgroundColor: primaryColor, opacity: 0.3 }}
+          />
+          <div className="absolute inset-0 flex items-center justify-center gap-2 text-sm font-bold select-none" style={{ color: primaryColor }}>
+            <ArrowRight size={16} />
+            Slide to Add to Cart
+          </div>
+          <div
+            className="absolute top-1 bottom-1 left-1 w-12 rounded-xl flex items-center justify-center shadow-lg transition-shadow"
+            style={{
+              backgroundColor: primaryColor,
+              transform: `translateX(${slidePercent === 0 ? 0 : `calc(${slidePercent}% - 48px)`})`,
+              transition: sliding ? 'none' : 'transform 0.3s ease',
+            }}
           >
-            <ShoppingCart size={18} />
-            Add to Cart
-          </button>
+            <ShoppingCart size={18} className="text-white" />
+          </div>
         </div>
       </div>
     </div>
