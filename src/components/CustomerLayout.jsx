@@ -76,8 +76,12 @@ const CustomerLayoutInner = ({ children }) => {
               </button>
             )}
             <Link to={p('/')} className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm" style={{ backgroundColor: primaryColor }}>
-                <span className="text-base">{restaurant?.logo && restaurant.logo.length < 5 ? restaurant.logo : '🍔'}</span>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm" style={{ backgroundColor: primaryColor }}>
+                {restaurant?.logo && (restaurant.logo.startsWith('data:') || restaurant.logo.startsWith('http') || restaurant.logo.startsWith('/uploads')) ? (
+                  <img src={restaurant.logo} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-base">{restaurant?.logo || '🍔'}</span>
+                )}
               </div>
               <div className="min-w-0">
                 <h1 className="text-[13px] font-bold text-gray-800 leading-tight truncate max-w-[160px] sm:max-w-[220px]">{restaurant?.name || 'Menu'}</h1>

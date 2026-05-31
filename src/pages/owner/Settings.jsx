@@ -245,7 +245,7 @@ const OwnerSettings = () => {
             <div className="rounded-xl p-4 border-2" style={{ borderColor: primaryColor + '30', backgroundColor: primaryColor + '08' }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl overflow-hidden flex-shrink-0" style={{ backgroundColor: primaryColor + '15' }}>
-                  {form.logo && (form.logo.startsWith('data:image') || form.logo.startsWith('http')) ? (
+                  {form.logo && (form.logo.startsWith('data:') || form.logo.startsWith('http') || form.logo.startsWith('/uploads')) ? (
                     <img src={form.logo} alt="Logo" className="w-full h-full object-cover" />
                   ) : (form.logo || '🍔')}
                 </div>

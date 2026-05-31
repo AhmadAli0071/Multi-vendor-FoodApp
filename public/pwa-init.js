@@ -29,7 +29,7 @@
 
   var link = document.createElement('link');
   link.rel = 'manifest';
-  link.href = '/manifest-' + appSuffix + '.json';
+  link.href = '/manifest.json';
   document.head.appendChild(link);
 
   document.title = appName + ' - Food Ordering';

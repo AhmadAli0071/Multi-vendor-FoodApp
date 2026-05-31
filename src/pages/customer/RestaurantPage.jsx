@@ -56,7 +56,11 @@ const RestaurantPage = () => {
           {/* Restaurant Info */}
           <div className="flex items-start gap-3 mb-4">
             <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
-              <span className="text-2xl">{restaurant.logo && restaurant.logo.length < 5 ? restaurant.logo : '🍔'}</span>
+              {restaurant.logo && (restaurant.logo.startsWith('data:') || restaurant.logo.startsWith('http') || restaurant.logo.startsWith('/uploads')) ? (
+                <img src={restaurant.logo} alt="" className="w-10 h-10 rounded-xl object-cover" />
+              ) : (
+                <span className="text-2xl">{restaurant.logo || '🍔'}</span>
+              )}
             </div>
             <div className="min-w-0 flex-1 pt-0.5">
               <h1 className="text-lg font-extrabold leading-tight">{restaurant.name}</h1>

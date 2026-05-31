@@ -356,7 +356,13 @@ const Landing = () => {
               <Link key={r.id} to={`/r/${r.slug}`}
                 className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ backgroundColor: r.primary_color || '#FF6B35' }}>
-                  <span className="text-white">{r.logo && r.logo.length < 5 ? r.logo : '🍽️'}</span>
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                    {r.logo && (r.logo.startsWith('data:') || r.logo.startsWith('http') || r.logo.startsWith('/uploads')) ? (
+                      <img src={r.logo} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                    ) : (
+                      <span className="text-white">{r.logo || '🍽️'}</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-800 text-sm truncate">{r.name}</h3>
