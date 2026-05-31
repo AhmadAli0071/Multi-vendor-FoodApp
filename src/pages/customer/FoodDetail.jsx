@@ -95,15 +95,21 @@ const FoodDetail = () => {
       </button>
 
       {/* Hero Image */}
-      <div className="h-56 sm:h-72 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: primaryColor }}>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-40 h-40 rounded-full bg-white" />
-          <div className="absolute bottom-0 left-5 w-32 h-32 rounded-full bg-white" />
-        </div>
+      <div className="h-56 sm:h-72 relative overflow-hidden" style={{ backgroundColor: primaryColor }}>
         {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/uploads')) ? (
-          <img src={item.image} alt={item.name} className="w-full h-full object-cover relative z-10" />
+          <>
+            <div
+              className="absolute inset-0 bg-center bg-cover scale-110 blur-3xl opacity-80"
+              style={{ backgroundImage: `url(${item.image})` }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain relative z-10 drop-shadow-2xl rounded-lg" />
+            </div>
+          </>
         ) : (
-          <span className="text-[100px] relative z-10 drop-shadow-xl">{item.image || '🍽️'}</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[100px] drop-shadow-xl">{item.image || '🍽️'}</span>
+          </div>
         )}
         {item.popular && (
           <div className="absolute top-4 right-4 bg-white text-pink-500 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-lg z-10">
