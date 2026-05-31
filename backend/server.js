@@ -83,6 +83,7 @@ export const emitOrderStatusChange = (io, orderId, status, order) => {
 
 // Security headers — relaxed CSP to allow external images (logo uploads) and fonts
 app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
