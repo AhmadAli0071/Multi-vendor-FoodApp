@@ -84,7 +84,7 @@ const OwnerLayout = () => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <NotificationBell pendingCount={pendingCount} />
+          <NotificationBell pendingCount={pendingCount} navigateTo={`${base}/orders`} />
           <button
             onClick={toggleOpen}
             className={`p-2 rounded-lg transition-colors ${isOpen ? 'hover:bg-white/10' : 'bg-white/20 hover:bg-white/30'}`}

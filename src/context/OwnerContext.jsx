@@ -95,6 +95,22 @@ export const OwnerProvider = ({ children }) => {
     return () => { sock.disconnect(); };
   }, [isLoggedIn, restaurant?.id]);
 
+  // Poll orders every 10s (catches orders from other Render services where socket.io can't cross)
+  useEffect(() => {
+    if (!isLoggedIn || !restaurant) return;
+    const token = localStorage.getItem('owner_token');
+    if (!token) return;
+    const fetchOrders = () => {
+      fetch(`${API_BASE}/orders?restaurant_id=${restaurant.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(r => r.json()).then(d => {
+        if (d.success) setOrders(d.orders.map(normalizeOrder));
+      }).catch(() => {});
+    };
+    const interval = setInterval(fetchOrders, 10000);
+    return () => clearInterval(interval);
+  }, [isLoggedIn, restaurant?.id]);
+
   // Sync to localStorage always (backup)
   useEffect(() => { localStorage.setItem('owner_menu', JSON.stringify(menu)); }, [menu]);
   useEffect(() => { localStorage.setItem('owner_orders', JSON.stringify(orders)); }, [orders]);

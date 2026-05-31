@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   ShoppingBag, Clock, DollarSign, UtensilsCrossed,
   ChevronRight, AlertCircle
@@ -9,6 +9,8 @@ import { useOwner } from '../../context/OwnerContext';
 const OwnerDashboard = () => {
   const { stats, orders, restaurant, isOpen } = useOwner();
   const navigate = useNavigate();
+  const location = useLocation();
+  const base = location.pathname.startsWith('/owner') ? '/owner' : '';
 
   const formatPKR = (amount) => `PKR ${amount.toLocaleString()}`;
 
@@ -104,14 +106,14 @@ const OwnerDashboard = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-2">
-        <button onClick={() => navigate('/owner/menu')} className="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between hover:bg-orange-50 transition-colors">
+        <button onClick={() => navigate(`${base}/menu`)} className="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between hover:bg-orange-50 transition-colors">
           <div className="flex items-center gap-2">
             <span className="text-lg">🍽️</span>
             <span className="text-sm font-medium text-gray-700">Manage Menu</span>
           </div>
           <ChevronRight size={16} className="text-gray-400" />
         </button>
-        <button onClick={() => navigate('/owner/orders')} className="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between hover:bg-orange-50 transition-colors">
+        <button onClick={() => navigate(`${base}/orders`)} className="bg-white rounded-xl p-3 shadow-sm flex items-center justify-between hover:bg-orange-50 transition-colors">
           <div className="flex items-center gap-2">
             <span className="text-lg">📋</span>
             <span className="text-sm font-medium text-gray-700">View Orders</span>
@@ -124,7 +126,7 @@ const OwnerDashboard = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <h2 className="text-sm font-bold text-gray-800">Recent Orders</h2>
-          <button onClick={() => navigate('/owner/orders')} className="text-xs text-[#FF6B35] font-medium">
+          <button onClick={() => navigate(`${base}/orders`)} className="text-xs text-[#FF6B35] font-medium">
             View All
           </button>
         </div>

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, X, Package } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { startRinging, stopRinging } from '../utils/sound';
 
 const NewOrderPopup = ({ alert, onDismiss }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [visible, setVisible] = useState(false);
+  const base = location.pathname.startsWith('/owner') ? '/owner' : '';
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -19,7 +21,7 @@ const NewOrderPopup = ({ alert, onDismiss }) => {
 
   const handleView = () => {
     onDismiss(alert.orderId);
-    navigate('/owner/orders');
+    navigate(`${base}/orders`);
   };
 
   return (
