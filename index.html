@@ -16,17 +16,30 @@
       // Set correct manifest and SW URLs per app so browser treats them as separate PWAs
       (function() {
         var path = window.location.pathname;
-        var appSuffix = 'admin';
-        var appName = 'FoodApp';
+        var hostname = window.location.hostname;
+
+        // Detect app type from Render service name (dedicated services)
+        var renderService = hostname.endsWith('.onrender.com') ? hostname.split('.')[0] : null;
+        var appSuffix = renderService && renderService.includes('owner') ? 'owner'
+                      : renderService && renderService.includes('admin') ? 'admin'
+                      : renderService && renderService.includes('landing') ? 'landing'
+                      : renderService ? 'customer' : 'admin';
+
+        // Override by path-based detection (shared admin service)
         if (path.startsWith('/owner')) {
           appSuffix = 'owner';
-          appName = 'Owner Panel';
         } else if (path.match(/^\/r\//)) {
           appSuffix = 'customer';
+        }
+
+        var appName = 'FoodApp';
+        if (appSuffix === 'owner') {
+          appName = 'Owner Panel';
+        } else if (appSuffix === 'customer' && path.match(/\/r\/([^/]+)/)) {
           var m = path.match(/\/r\/([^/]+)/);
           if (m) appName = m[1].charAt(0).toUpperCase() + m[1].slice(1).replace(/-/g, ' ');
-        } else {
-          var host = window.location.hostname.split('.');
+        } else if (appSuffix === 'admin' && !renderService) {
+          var host = hostname.split('.');
           if (host.length >= 3 && host[0] !== 'www' && host[0] !== 'admin' && host[0] !== 'owner') {
             appName = host[0].charAt(0).toUpperCase() + host[0].slice(1).replace(/-/g, ' ');
           }
