@@ -26,14 +26,15 @@ export function getSubdomain() {
 export function getAppType() {
   const serviceName = getRenderServiceName();
   if (serviceName) {
-    if (serviceName.includes('landing')) return 'landing';
-    if (serviceName.includes('owner')) return 'owner';
     if (serviceName.includes('admin')) return 'admin';
-    return 'admin';
+    if (serviceName.includes('owner')) return 'owner';
+    if (serviceName.includes('landing')) return 'landing';
+    return 'landing';
   }
 
   const subdomain = getSubdomain();
-  if (!subdomain || subdomain === 'www' || subdomain === 'admin') return 'admin';
+  if (!subdomain || subdomain === 'www') return 'landing';
+  if (subdomain === 'admin') return 'admin';
   if (subdomain === 'owner') return 'owner';
   return 'customer';
 }

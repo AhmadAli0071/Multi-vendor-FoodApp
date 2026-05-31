@@ -81,6 +81,32 @@ function OwnerSubdomainRoutes() {
   );
 }
 
+function PublicRoutes() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/r/:slug" element={<CustomerLayout><RestaurantPage /></CustomerLayout>} />
+        <Route path="/r/:slug/cart" element={<CustomerLayout><CartPage /></CustomerLayout>} />
+        <Route path="/r/:slug/checkout" element={<CustomerLayout><CheckoutPage /></CustomerLayout>} />
+        <Route path="/r/:slug/order/:orderId" element={<CustomerLayout><OrderTrackingPage /></CustomerLayout>} />
+        <Route path="/r/:slug/login" element={<CustomerLayout><LoginPage /></CustomerLayout>} />
+        <Route path="/r/:slug/signup" element={<CustomerLayout><SignupPage /></CustomerLayout>} />
+        <Route path="/r/:slug/account" element={<CustomerLayout><AccountPage /></CustomerLayout>} />
+        <Route path="/r/:slug/item/:itemId" element={<CustomerLayout><FoodDetail /></CustomerLayout>} />
+
+        <Route path="/owner/login" element={<OwnerProvider><OwnerLogin /></OwnerProvider>} />
+        <Route path="/owner" element={<OwnerProvider><OwnerLayout /></OwnerProvider>}>
+          <Route index element={<OwnerDashboard />} />
+          <Route path="menu" element={<MenuManagement />} />
+          <Route path="orders" element={<OwnerOrders />} />
+          <Route path="settings" element={<OwnerSettings />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  );
+}
+
 function PathBasedRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -150,7 +176,7 @@ function AppContent() {
   }
 
   if (appType === 'landing') {
-    return <Landing />;
+    return <PublicRoutes />;
   }
 
   return <PathBasedRoutes />;
