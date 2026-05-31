@@ -13,7 +13,6 @@ const Landing = () => {
   const [selectedMethod, setSelectedMethod] = useState('');
   const [amount, setAmount] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -64,38 +63,27 @@ const Landing = () => {
       toast.error('Image must be under 5MB');
       return;
     }
-    setSelectedFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    setImagePreview(null);
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedFile || !amount || !selectedMethod) {
+    if (!imagePreview || !amount || !selectedMethod) {
       toast.error('Please fill all fields and upload screenshot');
       return;
     }
 
     setSubmitting(true);
     try {
-      let imageUrl = '';
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append('image', selectedFile);
-        const uploadRes = await fetch(`${API_BASE}/upload/public`, {
-          method: 'POST',
-          body: formData
-        });
-        const uploadData = await uploadRes.json();
-        if (!uploadData.success) throw new Error('Upload failed');
-        imageUrl = uploadData.data.url;
-      }
-
       const body = {
         payment_id: paymentId.trim().toUpperCase(),
         amount: parseFloat(amount),
         plan: restaurant.plan,
         payment_method: selectedMethod,
-        image: imageUrl
+        image: imagePreview
       };
 
       const res = await fetch(`${API_BASE}/payment-proofs/public`, {

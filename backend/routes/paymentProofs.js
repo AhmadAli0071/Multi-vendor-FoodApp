@@ -2,16 +2,6 @@ import express from 'express';
 import { protect } from '../middleware/auth.js';
 import PaymentProof from '../models/PaymentProof.js';
 import { db } from '../config/database.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
 
 const router = express.Router();
 
@@ -76,16 +66,6 @@ router.post('/public', async (req, res) => {
     const price = planPrices[plan || restaurant.plan] || 5999;
     const monthsToAdd = Math.max(1, Math.floor(parseFloat(amount) / price));
 
-    // Save image: if base64, write to file and store URL
-    let imageUrl = image;
-    if (image && image.startsWith('data:image')) {
-      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      const filename = `proof_${Date.now()}_${Math.round(Math.random() * 1e9)}.png`;
-      fs.writeFileSync(path.join(uploadsDir, filename), buffer);
-      imageUrl = `/uploads/${filename}`;
-    }
-
     await PaymentProof.create({
       restaurant_id: restaurant.id,
       restaurant_name: restaurant.name,
@@ -93,7 +73,7 @@ router.post('/public', async (req, res) => {
       amount: parseFloat(amount),
       plan: plan || restaurant.plan,
       payment_method: payment_method || '',
-      image: imageUrl,
+      image,
       status: 'pending',
       months_to_add: monthsToAdd
     });
@@ -127,21 +107,12 @@ router.post('/', protect, async (req, res, next) => {
     const price = planPrices[plan || restaurant.plan] || 5999;
     const monthsToAdd = Math.max(1, Math.floor(parseFloat(amount) / price));
 
-    let imageUrl = image;
-    if (image && image.startsWith('data:image')) {
-      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      const filename = `proof_${Date.now()}_${Math.round(Math.random() * 1e9)}.png`;
-      fs.writeFileSync(path.join(uploadsDir, filename), buffer);
-      imageUrl = `/uploads/${filename}`;
-    }
-
     await PaymentProof.create({
       restaurant_id: restaurant.id,
       restaurant_name: restaurant.name,
       amount: parseFloat(amount),
       plan: plan || restaurant.plan,
-      image: imageUrl,
+      image,
       status: 'pending',
       months_to_add: monthsToAdd
     });
