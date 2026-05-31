@@ -16,6 +16,8 @@ const Subscriptions = () => {
 
   // Payment Proofs
   const [paymentProofs, setPaymentProofs] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const fetchProofs = async () => {
     try {
       const t = localStorage.getItem('admin_token');
@@ -162,7 +164,18 @@ const Subscriptions = () => {
                     <td className="px-6 py-4"><div className="flex space-x-2">
                       <button onClick={() => { setSelectedRestaurant(restaurant); setShowRenewModal(true); }} className="px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-medium"><RefreshCw size={14} className="inline mr-1" />Renew</button>
                       <button className="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-medium"><ArrowUpRight size={14} className="inline mr-1" />Change</button>
-                      <button onClick={() => { setSelectedRestaurant(restaurant); setShowHistoryModal(true); }} className="px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium">History</button>
+                      <button onClick={async () => {
+                        setSelectedRestaurant(restaurant);
+                        setShowHistoryModal(true);
+                        setHistoryLoading(true);
+                        try {
+                          const t = localStorage.getItem('admin_token');
+                          const r = await fetch(`${API_BASE}/payment-proofs/history`, { headers: { 'Authorization': `Bearer ${t}` } });
+                          const d = await r.json();
+                          if (d.success) setPaymentHistory(d.proofs.filter(p => p.restaurant_id === restaurant.id));
+                        } catch {}
+                        setHistoryLoading(false);
+                      }} className="px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-sm font-medium">History</button>
                     </div></td>
                   </tr>
                 );
@@ -179,7 +192,45 @@ const Subscriptions = () => {
 
       {/* History Modal */}
       {showHistoryModal && selectedRestaurant && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"><div className="bg-white rounded-xl max-w-md w-full p-6"><div className="flex justify-between items-center mb-6"><div><h2 className="text-xl font-bold text-gray-900">Payment History</h2><p className="text-sm text-gray-500">{selectedRestaurant.name}</p></div><button onClick={() => setShowHistoryModal(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button></div><div className="space-y-3 text-center text-gray-500 py-8">No payment history available</div><div className="mt-6"><button onClick={() => setShowHistoryModal(false)} className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium">Close</button></div></div></div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowHistoryModal(false)}>
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Payment History</h2>
+                <p className="text-sm text-gray-500">{selectedRestaurant.name}</p>
+              </div>
+              <button onClick={() => setShowHistoryModal(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+            </div>
+            {historyLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#FF6B35] border-t-transparent mx-auto" />
+              </div>
+            ) : paymentHistory.length === 0 ? (
+              <div className="text-center text-gray-400 py-8 text-sm">No payment history</div>
+            ) : (
+              <div className="space-y-3">
+                {paymentHistory.map(p => (
+                  <div key={p._id} className="border border-gray-200 rounded-xl p-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="font-bold text-gray-800 text-sm">{p.plan} Plan</p>
+                        <p className="text-xs text-gray-400">{new Date(p.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${p.status === 'approved' ? 'bg-green-100 text-green-700' : p.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                      </span>
+                    </div>
+                    <p className="text-lg font-bold text-[#FF6B35]">PKR {p.amount.toLocaleString()}</p>
+                    {p.image && (
+                      <img src={getImageUrl(p.image)} alt="Payment proof" className="w-full rounded-lg border max-h-40 object-contain mt-2 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(p.image))} />
+                    )}
+                    {p.admin_note && <p className="text-xs text-gray-400 mt-1">Note: {p.admin_note}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Image Preview Modal */}
