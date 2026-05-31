@@ -22,10 +22,19 @@ const Dashboard = () => {
   const expiringRestaurants = restaurants.filter(r => {
     if (!r.active) return false;
     if (!r.subscriptionEnd) return false;
+    const endDate = new Date(r.subscriptionEnd);
+    if (isNaN(endDate.getTime())) return false;
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const sevenDaysFromNow = new Date(today); sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    const endDate = new Date(r.subscriptionEnd);
     return endDate >= today && endDate <= sevenDaysFromNow;
+  });
+
+  const expiredRestaurants = restaurants.filter(r => {
+    if (!r.subscriptionEnd) return false;
+    const endDate = new Date(r.subscriptionEnd);
+    if (isNaN(endDate.getTime())) return false;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return endDate < today;
   });
 
   const recentOrders = [...orders]
@@ -104,9 +113,11 @@ const Dashboard = () => {
     if (!url) return '';
     if (url.startsWith('data:')) return url;
     if (url.startsWith('http')) return url;
-    const base = API_BASE.replace('/api', '');
+    const base = API_BASE.replace(/\/api$/, '');
     return `${base}${url}`;
   };
+
+  const [imgErrors, setImgErrors] = useState({});
 
   const StatusBadge = ({ status }) => {
     const s = (status || '').toLowerCase();
@@ -144,8 +155,13 @@ const Dashboard = () => {
                   <p className="text-lg font-bold text-[#FF6B35] mt-1">PKR {proof.amount.toLocaleString()}</p>
                   <p className="text-xs text-gray-400">~{proof.months_to_add} month(s)</p>
                 </div>
-                {proof.image && (
-                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-40 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} />
+                {proof.image && !imgErrors[proof._id] && (
+                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-40 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} onError={() => setImgErrors(p => ({ ...p, [proof._id]: true }))} />
+                )}
+                {proof.image && imgErrors[proof._id] && (
+                  <div className="w-full rounded-lg border max-h-40 mb-3 bg-gray-100 flex items-center justify-center cursor-pointer" onClick={() => setPreviewImage(getImageUrl(proof.image))}>
+                    <ImageIcon size={32} className="text-gray-300" />
+                  </div>
                 )}
                 <div className="flex gap-2">
                   <button onClick={() => handleApproveProof(proof._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-green-700">
@@ -199,10 +215,10 @@ const Dashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="p-6 border-b border-gray-100 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-800">Subscription Alerts</h2>
-            <AlertTriangle className="text-yellow-500" size={20} />
+            <AlertTriangle className={expiringRestaurants.length > 0 || expiredRestaurants.length > 0 ? 'text-yellow-500' : 'text-gray-300'} size={20} />
           </div>
           <div className="p-4">
-            {expiringRestaurants.length > 0 ? (
+            {expiringRestaurants.length > 0 || expiredRestaurants.length > 0 ? (
               <div className="space-y-2">
                 {expiringRestaurants.map(r => {
                   const daysLeft = Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000);
@@ -214,6 +230,20 @@ const Dashboard = () => {
                           <p className="text-xs text-gray-500 mt-0.5">{daysLeft} days left</p>
                         </div>
                         <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs font-medium">Expiring</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                {expiredRestaurants.map(r => {
+                  const daysOver = Math.abs(Math.ceil((new Date(r.subscriptionEnd) - new Date()) / 86400000));
+                  return (
+                    <div key={r.id} className="p-3 border border-red-200 bg-red-50 rounded-lg">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-medium text-gray-900 text-sm">{r.name}</h3>
+                          <p className="text-xs text-red-500 mt-0.5">{daysOver} days overdue</p>
+                        </div>
+                        <span className="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-medium">Expired</span>
                       </div>
                     </div>
                   );
