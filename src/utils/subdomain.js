@@ -24,6 +24,12 @@ export function getSubdomain() {
 }
 
 export function getAppType() {
+  const path = window.location.pathname;
+
+  // Path-based detection (shared domain like foodapp-admin-f13g.onrender.com)
+  if (path.startsWith('/owner')) return 'owner';
+  if (path.match(/^\/r\//)) return 'customer';
+
   const serviceName = getRenderServiceName();
   if (serviceName) {
     if (serviceName.includes('admin')) return 'admin';
