@@ -151,13 +151,25 @@ export const CustomerProvider = ({ children, slug: providerSlug }) => {
         }
         fixLogo(mergedRest);
         setRestaurant(mergedRest);
+        // Fix relative image URLs for menu items
+        const fixItemImages = (items) => {
+          return items.map(cat => ({
+            ...cat,
+            items: (cat.items || []).map(item => ({
+              ...item,
+              image: item.image && item.image.startsWith('/uploads/')
+                ? (OWNER_URL ? `${OWNER_URL.replace(/\/owner$/,'')}${item.image}` : item.image)
+                : item.image
+            }))
+          }));
+        };
         const apiMenu = menuData.menu || [];
         if (apiMenu.length > 0) {
-          setMenu(apiMenu);
+          setMenu(fixItemImages(apiMenu));
         } else {
           // Try localStorage menu for this restaurant
           const localMenu = loadLocalMenu(resData.restaurant.id);
-          setMenu(localMenu);
+          setMenu(fixItemImages(localMenu));
         }
       } else {
         throw new Error('API failed');

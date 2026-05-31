@@ -54,8 +54,12 @@ const CartPage = () => {
         {cart.items.map(item => (
           <div key={item.id} className="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-sm border border-gray-100">
             {/* Image */}
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">{item.image || '🍽️'}</span>
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/uploads')) ? (
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl">{item.image || '🍽️'}</span>
+              )}
             </div>
 
             {/* Info */}
