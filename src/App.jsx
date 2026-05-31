@@ -8,7 +8,7 @@ import Layout from './components/Layout';
 import CustomerLayout from './components/CustomerLayout';
 import OwnerLayout from './components/OwnerLayout';
 import ErrorBoundary from './components/ErrorBoundary';
-import { getAppType, getRestaurantSlug } from './utils/subdomain';
+import { getAppType, getRestaurantSlug, getRenderServiceName } from './utils/subdomain';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AddRestaurant = lazy(() => import('./pages/AddRestaurant'));
@@ -152,6 +152,8 @@ function AppContent() {
   const [ready, setReady] = useState(false);
   const appType = getAppType();
   const customerSlug = getRestaurantSlug();
+  const serviceName = getRenderServiceName();
+  const onOwnerService = serviceName && serviceName.includes('owner');
 
   useEffect(() => {
     setReady(true);
@@ -165,15 +167,15 @@ function AppContent() {
     );
   }
 
-  if (appType === 'customer' && customerSlug) {
+  if (appType === 'customer' && customerSlug && !serviceName) {
     return <CustomerSubdomainRoutes slug={customerSlug} />;
   }
 
-  if (appType === 'owner') {
+  if (appType === 'owner' && onOwnerService) {
     return <OwnerSubdomainRoutes />;
   }
 
-  if (appType === 'landing') {
+  if (appType === 'landing' && !serviceName) {
     return <PublicRoutes />;
   }
 

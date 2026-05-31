@@ -1,6 +1,6 @@
 import { DOMAIN } from './config';
 
-function getRenderServiceName() {
+export function getRenderServiceName() {
   const hostname = window.location.hostname;
   if (hostname.endsWith('.onrender.com')) {
     return hostname.split('.')[0];
