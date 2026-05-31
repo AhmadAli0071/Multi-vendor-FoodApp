@@ -81,8 +81,21 @@ export const emitOrderStatusChange = (io, orderId, status, order) => {
   console.log(`[Socket] Emitted status update for order ${orderId}: ${status}`);
 };
 
-// Security headers
-app.use(helmet());
+// Security headers — relaxed CSP to allow external images (logo uploads) and fonts
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https://foodapp-owner.onrender.com", "https://foodapp-admin-f13g.onrender.com"],
+      fontSrc: ["'self'", "https:", "data:"],
+      connectSrc: ["'self'", "https://fonts.googleapis.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    }
+  }
+}));
 
 // Trust proxy (Render sits behind a proxy)
 app.set('trust proxy', 1);
@@ -194,7 +207,7 @@ function serveManifest(res, appType, hostname) {
   res.json({
     name, short_name: shortName,
     description: `FoodApp - ${name}`,
-    start_url: startUrl, display: 'standalone',
+    start_url: startUrl, display: 'fullscreen', display_override: ['fullscreen', 'standalone', 'minimal-ui', 'browser'],
     background_color: '#FFFFFF', theme_color: '#FF6B35',
     orientation: 'portrait-primary',
     icons: [
