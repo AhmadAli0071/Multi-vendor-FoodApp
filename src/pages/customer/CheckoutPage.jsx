@@ -31,6 +31,8 @@ const CheckoutPage = () => {
         notes: form.notes, customer_id: customer?.id || null
       });
       clearCart();
+      // Register push notifications for order updates
+      import('../../utils/push.js').then(m => m.registerPushSubscription('customer', result.order.id)).catch(() => {});
       toast.success('Order placed!');
       navigate(nav(`/order/${result.order.id}`));
     } catch (err) {

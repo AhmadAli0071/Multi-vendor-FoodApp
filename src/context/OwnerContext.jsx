@@ -209,6 +209,9 @@ export const OwnerProvider = ({ children }) => {
       const savedIsOpen = localStorage.getItem(`isOpen_${rest.id}`);
       setIsOpen(savedIsOpen !== null ? savedIsOpen === 'true' : true);
 
+      // Register push notifications (async, non-blocking)
+      import('../utils/push.js').then(m => m.registerPushSubscription('owner', rest.id)).catch(() => {});
+
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);

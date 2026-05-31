@@ -5,6 +5,8 @@ import { body, validationResult } from 'express-validator';
 import { db } from '../config/database.js';
 import { sendNewOrderNotificationToRestaurant } from '../services/email.js';
 import { sendNewOrderWhatsApp } from '../services/whatsapp.js';
+import { sendPush } from '../services/push.js';
+import PushSubscription from '../models/PushSubscription.js';
 
 const router = express.Router();
 
@@ -105,11 +107,17 @@ router.post('/orders', [
        });
      } catch (e) { console.error('Socket emit error:', e); }
 
-     // Notify restaurant about new order (async)
-     if (restaurant) {
-       sendNewOrderNotificationToRestaurant(order, restaurant).catch(err => console.error('New order email error:', err));
-       sendNewOrderWhatsApp(order, restaurant).catch(err => console.error('New order WhatsApp error:', err));
-     }
+      // Notify restaurant about new order (async)
+      if (restaurant) {
+        sendNewOrderNotificationToRestaurant(order, restaurant).catch(err => console.error('New order email error:', err));
+        sendNewOrderWhatsApp(order, restaurant).catch(err => console.error('New order WhatsApp error:', err));
+        // Push notification to owner
+        PushSubscription.find({ restaurant_id, type: 'owner' }).then(subs => {
+          subs.forEach(s => {
+            sendPush(s.subscription, 'New Order!', `Order #${order.id.slice(-8)} — Rs. ${total}`, { url: '/' }).catch(() => {});
+          });
+        }).catch(err => console.error('Push find error:', err));
+      }
 
     res.status(201).json({ success: true, message: 'Order placed!', order: { id: order.id, status: order.status, total: order.total, restaurant_name: restaurant.name, restaurant_phone: restaurant.whatsapp || restaurant.phone, created_at: order.created_at } });
   } catch (error) { next(error); }

@@ -52,3 +52,33 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'FoodApp', {
+      body: data.body || '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-96.png',
+      vibrate: [200, 100, 200],
+      requireInteraction: true,
+      silent: false,
+      tag: data.tag || 'order',
+      data: { url: data.url || '/' }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+      if (clients.length > 0) {
+        clients[0].focus();
+        return clients[0].navigate(url);
+      }
+      return clients.openWindow(url);
+    })
+  );
+});

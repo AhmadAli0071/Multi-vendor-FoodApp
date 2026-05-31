@@ -17,6 +17,8 @@ import paymentProofRoutes from './routes/paymentProofs.js';
 import paymentSettingsRoutes from './routes/paymentSettings.js';
 import uploadRoutes from './routes/upload.js';
 import menuRoutes from './routes/menu.js';
+import pushRoutes from './routes/push.js';
+import { getVapidPublicKey } from './services/push.js';
 import { db } from './config/database.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import corsOptions from './config/cors.js';
@@ -130,6 +132,12 @@ app.use('/api/payment-proofs', apiLimiter, paymentProofRoutes);
 app.use('/api/payment-settings', apiLimiter, paymentSettingsRoutes);
 app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/menu', apiLimiter, menuRoutes);
+app.use('/api/push', apiLimiter, pushRoutes);
+
+// Public VAPID key for push notifications
+app.get('/api/push/vapid-public-key', (req, res) => {
+  res.json({ publicKey: getVapidPublicKey() });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -243,6 +251,8 @@ function serveSw(res, appType, hostname) {
     self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
     self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
     self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||e.request.url.includes('/api/')||!e.request.url.startsWith(self.location.origin))return;e.respondWith(caches.match(e.request).then(c=>{let f=fetch(e.request).then(r=>{if(r&&r.status===200&&r.type==='basic'){let cl=r.clone();caches.open(CACHE_NAME).then(ca=>ca.put(e.request,cl))}return r}).catch(()=>{if(e.request.mode==='navigate')return caches.match('/');return c});return c||f}));});
+    self.addEventListener('push',e=>{const d=e.data?e.data.json():{};e.waitUntil(self.registration.showNotification(d.title||'FoodApp',{body:d.body||'',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[200,100,200],requireInteraction:true,silent:false,tag:d.tag||'order',data:{url:d.url||'/'}}));});
+    self.addEventListener('notificationclick',e=>{e.notification.close();const url=e.notification.data?.url||'/';e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(c=>{if(c.length>0){c[0].focus();return c[0].navigate(url)}return clients.openWindow(url)}));});
   `);
 }
 

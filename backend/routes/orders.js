@@ -3,6 +3,8 @@ import { db } from '../config/database.js';
 import { protect } from '../middleware/auth.js';
 import { sendOrderStatusEmail, sendNewOrderNotificationToRestaurant } from '../services/email.js';
 import { sendNewOrderWhatsApp } from '../services/whatsapp.js';
+import { sendPush } from '../services/push.js';
+import PushSubscription from '../models/PushSubscription.js';
 import Order from '../models/Order.js';
 
 const router = express.Router();
@@ -48,6 +50,17 @@ router.put('/:id/status', protect, async (req, res, next) => {
         timestamp: new Date().toISOString()
       });
     } catch (socketErr) { console.error('Socket emit error:', socketErr); }
+
+    // Push notification to customer
+    if (status !== 'pending') {
+      const statusLabels = { accepted: 'Order Accepted', preparing: 'Preparing Your Order', ready: 'Order Ready', delivered: 'Order Delivered', cancelled: 'Order Cancelled' };
+      const msg = statusLabels[status] || `Status: ${status}`;
+      PushSubscription.find({ order_id: id, type: 'customer' }).then(subs => {
+        subs.forEach(s => {
+          sendPush(s.subscription, msg, `Order #${id.slice(-8)} is now ${status}`, { url: `/${id}` }).catch(() => {});
+        });
+      }).catch(err => console.error('Push find error:', err));
+    }
 
     // Send email to customer (async, non-blocking)
     if (status !== 'pending') {
