@@ -172,7 +172,12 @@ function getAppType(req) {
   return 'admin'; // default
 }
 
-function serveManifest(res, appType) {
+function isDedicatedService(hostname, type) {
+  const renderName = getRenderServiceName(hostname);
+  return renderName && renderName.includes(type);
+}
+
+function serveManifest(res, appType, hostname) {
   let name = 'FoodApp Admin';
   let shortName = 'Admin';
   let startUrl = '/';
@@ -180,7 +185,7 @@ function serveManifest(res, appType) {
   if (appType === 'owner') {
     name = 'FoodApp Owner';
     shortName = 'Owner';
-    startUrl = '/owner';
+    startUrl = isDedicatedService(hostname, 'owner') ? '/' : '/owner';
   } else if (appType === 'customer') {
     name = 'FoodApp';
     shortName = 'FoodApp';
@@ -207,15 +212,16 @@ function serveManifest(res, appType) {
 }
 
 // Separate manifest URLs so browser treats each app as a different PWA
-app.get('/manifest-admin.json', (req, res) => serveManifest(res, 'admin'));
-app.get('/manifest-owner.json', (req, res) => serveManifest(res, 'owner'));
-app.get('/manifest-customer.json', (req, res) => serveManifest(res, 'customer'));
+app.get('/manifest-admin.json', (req, res) => serveManifest(res, 'admin', req.hostname));
+app.get('/manifest-owner.json', (req, res) => serveManifest(res, 'owner', req.hostname));
+app.get('/manifest-customer.json', (req, res) => serveManifest(res, 'customer', req.hostname));
 
 // Keep the dynamic one as default for backward compatibility
-app.get('/manifest.json', (req, res) => serveManifest(res, getAppType(req)));
+app.get('/manifest.json', (req, res) => serveManifest(res, getAppType(req), req.hostname));
 
-function serveSw(res, appType) {
+function serveSw(res, appType, hostname) {
   const manifestUrl = `/manifest-${appType}.json`;
+  const navigateFallback = (appType === 'owner' && !isDedicatedService(hostname, 'owner')) ? "'/owner'" : "'/'";
   res.type('application/javascript');
   res.send(`
     const CACHE_NAME = 'foodapp-${appType}-v1';
@@ -227,12 +233,12 @@ function serveSw(res, appType) {
 }
 
 // Separate SW URLs for each app (unique cache per app)
-app.get('/sw-admin.js', (req, res) => serveSw(res, 'admin'));
-app.get('/sw-owner.js', (req, res) => serveSw(res, 'owner'));
-app.get('/sw-customer.js', (req, res) => serveSw(res, 'customer'));
+app.get('/sw-admin.js', (req, res) => serveSw(res, 'admin', req.hostname));
+app.get('/sw-owner.js', (req, res) => serveSw(res, 'owner', req.hostname));
+app.get('/sw-customer.js', (req, res) => serveSw(res, 'customer', req.hostname));
 
 // Keep dynamic SW as default
-app.get('/sw.js', (req, res) => serveSw(res, getAppType(req)));
+app.get('/sw.js', (req, res) => serveSw(res, getAppType(req), req.hostname));
 
 // Serve frontend in production (MUST be after API routes, before 404)
 const distPath = path.resolve(__dirname, '..', 'dist');
