@@ -119,7 +119,7 @@ const FoodDetail = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-5 pt-6 pb-24 space-y-5 -mt-6 bg-white rounded-t-3xl relative">
+      <div className="flex-1 px-5 pt-6 pb-8 space-y-5 -mt-6 bg-white rounded-t-3xl relative">
         {/* Title & Price */}
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -169,20 +169,8 @@ const FoodDetail = () => {
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Sticky Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-lg mx-auto safe-bottom">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex-1">
-            <p className="text-[11px] text-gray-400">{quantity} item{quantity > 1 ? 's' : ''}</p>
-            <p className="text-lg font-extrabold" style={{ color: primaryColor }}>Rs. {item.price * quantity}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[11px] text-gray-400">Total</p>
-            <p className="text-lg font-extrabold" style={{ color: primaryColor }}>Rs. {item.price * quantity}</p>
-          </div>
-        </div>
+        {/* Slide to Add to Cart */}
         <div
           ref={sliderRef}
           onTouchStart={handleTouchStart}
@@ -192,7 +180,7 @@ const FoodDetail = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          className="relative w-full h-14 rounded-2xl overflow-hidden select-none cursor-grab active:cursor-grabbing"
+          className="relative w-full h-14 rounded-2xl overflow-hidden select-none cursor-grab active:cursor-grabbing my-2"
           style={{ backgroundColor: primaryColor + '20' }}
         >
           <div
