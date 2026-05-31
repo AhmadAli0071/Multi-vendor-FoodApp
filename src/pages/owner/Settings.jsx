@@ -3,7 +3,7 @@ import { Store, Palette, Truck, ShoppingBag, Save, ChevronRight, Upload, X, Lock
 import { QRCodeSVG } from 'qrcode.react';
 import { useOwner } from '../../context/OwnerContext';
 import { ownerApi } from '../../utils/ownerApi';
-import { APP_URL, DOMAIN } from '../../utils/config';
+import { APP_URL, DOMAIN, OWNER_URL } from '../../utils/config';
 import toast from 'react-hot-toast';
 
 const OwnerSettings = () => {
@@ -106,19 +106,19 @@ const OwnerSettings = () => {
         <p className="text-xs text-gray-500">Scan to open your owner dashboard</p>
         <div className="bg-gray-50 rounded-xl p-4 flex justify-center">
           <QRCodeSVG
-            value={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+            value={OWNER_URL}
             size={180}
             level="M"
           />
         </div>
         <div className="text-center">
           <a
-            href={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+            href={OWNER_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-blue-600 break-all font-mono"
           >
-            {DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`}
+            {OWNER_URL}
           </a>
         </div>
         <button
@@ -142,7 +142,7 @@ const OwnerSettings = () => {
           <Download size={14} /> Download QR
         </button>
         <div className="owner-qr-svg hidden">
-          <QRCodeSVG value={DOMAIN ? `https://owner.${DOMAIN}` : `${APP_URL}/owner`} size={200} level="M" />
+          <QRCodeSVG value={OWNER_URL} size={200} level="M" />
         </div>
       </div>
 

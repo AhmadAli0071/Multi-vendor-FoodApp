@@ -4,7 +4,7 @@ import { Plus, Upload, X, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAppContext } from '../context/AppContext';
 import { uploadImage } from '../utils/api';
-import { APP_URL, getCustomerAppUrl } from '../utils/config';
+import { APP_URL, OWNER_URL, getCustomerAppUrl } from '../utils/config';
 import toast from 'react-hot-toast';
 
 const AddRestaurant = () => {
@@ -144,7 +144,7 @@ const AddRestaurant = () => {
   };
 
   const customerUrl = getCustomerAppUrl(generateSlug(formData.name || 'restaurant'));
-  const ownerUrl = `${APP_URL}/owner`;
+  const ownerUrl = OWNER_URL;
 
   return (
     <div className="space-y-6">
