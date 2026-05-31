@@ -7,8 +7,17 @@ const InstallPrompt = () => {
 
   useEffect(() => {
     if (getAppType() === 'admin') return;
-    if (!window.__deferredPrompt) return;
-    setShow(true);
+
+    if (window.__deferredPrompt) {
+      setShow(true);
+      return;
+    }
+
+    const handler = () => {
+      if (window.__deferredPrompt) setShow(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstall = () => {
