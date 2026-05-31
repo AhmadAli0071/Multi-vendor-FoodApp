@@ -12,38 +12,49 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
     <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png" />
-    <link rel="manifest" href="/manifest.json" />
     <script>
-      const path = window.location.pathname;
-      const match = path.match(/\/r\/([^/]+)/);
-      const isOwner = path.startsWith('/owner');
-      const subdomain = window.location.hostname.split('.');
-      let appName = 'FoodApp';
-      if (match) {
-        appName = match[1].charAt(0).toUpperCase() + match[1].slice(1).replace(/-/g, ' ');
-      } else if (isOwner) {
-        appName = 'Owner Panel';
-      } else if (subdomain.length >= 3 && subdomain[0] !== 'www' && subdomain[0] !== 'admin' && subdomain[0] !== 'owner') {
-        appName = subdomain[0].charAt(0).toUpperCase() + subdomain[0].slice(1).replace(/-/g, ' ');
-      }
-      document.title = appName + ' - Food Ordering';
-      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', appName);
+      // Set correct manifest and SW URLs per app so browser treats them as separate PWAs
+      (function() {
+        var path = window.location.pathname;
+        var appSuffix = 'admin';
+        var appName = 'FoodApp';
+        if (path.startsWith('/owner')) {
+          appSuffix = 'owner';
+          appName = 'Owner Panel';
+        } else if (path.match(/^\/r\//)) {
+          appSuffix = 'customer';
+          var m = path.match(/\/r\/([^/]+)/);
+          if (m) appName = m[1].charAt(0).toUpperCase() + m[1].slice(1).replace(/-/g, ' ');
+        } else {
+          var host = window.location.hostname.split('.');
+          if (host.length >= 3 && host[0] !== 'www' && host[0] !== 'admin' && host[0] !== 'owner') {
+            appName = host[0].charAt(0).toUpperCase() + host[0].slice(1).replace(/-/g, ' ');
+          }
+        }
+        // Set manifest link
+        var link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = '/manifest-' + appSuffix + '.json';
+        document.head.appendChild(link);
+        // Set title
+        document.title = appName + ' - Food Ordering';
+        var mt = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+        if (mt) mt.content = appName;
+        // Register correct SW
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw-' + appSuffix + '.js', { scope: '/' }).then(
+              function(r) { console.log('SW registered:', r.scope); },
+              function(e) { console.log('SW failed:', e); }
+            );
+          });
+        }
+      })();
     </script>
-    <title>FoodApp - Food Ordering Platform</title>
     <meta name="description" content="Order delicious food from your favorite restaurants. Smart, fast, and easy food ordering platform." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(
-            (registration) => { console.log('SW registered:', registration.scope); },
-            (error) => { console.log('SW registration failed:', error); }
-          );
-        });
-      }
-    </script>
   </head>
   <body>
     <div id="root"></div>

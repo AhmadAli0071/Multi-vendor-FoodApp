@@ -172,10 +172,7 @@ function getAppType(req) {
   return 'admin'; // default
 }
 
-// Dynamic manifest.json based on app type (for separate PWA apps)
-app.get('/manifest.json', (req, res) => {
-  const appType = getAppType(req);
-
+function serveManifest(res, appType) {
   let name = 'FoodApp Admin';
   let shortName = 'Admin';
   let startUrl = '/';
@@ -189,7 +186,7 @@ app.get('/manifest.json', (req, res) => {
     shortName = 'FoodApp';
   }
 
-  const manifest = {
+  res.json({
     name, short_name: shortName,
     description: `FoodApp - ${name}`,
     start_url: startUrl, display: 'standalone',
@@ -206,23 +203,36 @@ app.get('/manifest.json', (req, res) => {
       { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
     ],
     categories: ['food', 'lifestyle'], lang: 'en'
-  };
+  });
+}
 
-  res.json(manifest);
-});
+// Separate manifest URLs so browser treats each app as a different PWA
+app.get('/manifest-admin.json', (req, res) => serveManifest(res, 'admin'));
+app.get('/manifest-owner.json', (req, res) => serveManifest(res, 'owner'));
+app.get('/manifest-customer.json', (req, res) => serveManifest(res, 'customer'));
 
-// Dynamic service worker based on app type (separate caches = separate PWA)
-app.get('/sw.js', (req, res) => {
-  const appType = getAppType(req);
+// Keep the dynamic one as default for backward compatibility
+app.get('/manifest.json', (req, res) => serveManifest(res, getAppType(req)));
+
+function serveSw(res, appType) {
+  const manifestUrl = `/manifest-${appType}.json`;
   res.type('application/javascript');
   res.send(`
     const CACHE_NAME = 'foodapp-${appType}-v1';
-    const ASSETS = ['/','/index.html','/manifest.json','/icons/icon-192.png','/icons/icon-512.png'];
+    const ASSETS = ['/','/index.html','${manifestUrl}','/icons/icon-192.png','/icons/icon-512.png'];
     self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
     self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
     self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||e.request.url.includes('/api/'))return;e.respondWith(caches.match(e.request).then(c=>{let f=fetch(e.request).then(r=>{if(r&&r.status===200&&r.type==='basic'){let cl=r.clone();caches.open(CACHE_NAME).then(ca=>ca.put(e.request,cl))}return r}).catch(()=>{if(e.request.mode==='navigate')return caches.match('/');return c});return c||f}));});
   `);
-});
+}
+
+// Separate SW URLs for each app (unique cache per app)
+app.get('/sw-admin.js', (req, res) => serveSw(res, 'admin'));
+app.get('/sw-owner.js', (req, res) => serveSw(res, 'owner'));
+app.get('/sw-customer.js', (req, res) => serveSw(res, 'customer'));
+
+// Keep dynamic SW as default
+app.get('/sw.js', (req, res) => serveSw(res, getAppType(req)));
 
 // Serve frontend in production (MUST be after API routes, before 404)
 const distPath = path.resolve(__dirname, '..', 'dist');
