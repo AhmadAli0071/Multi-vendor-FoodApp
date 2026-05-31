@@ -147,14 +147,23 @@ function getSubdomain(hostname) {
   return null;
 }
 
-// Detect app type from hostname + request path (all apps may share one domain)
+// Detect app type from Referer + hostname (manifest/sw.js always fetched from root)
 function getAppType(req) {
   const path = req.path || '';
   const hostname = req.hostname;
 
-  // Path-based detection (for single-domain setup)
+  // Check the request path itself first (for non-root requests)
   if (path.startsWith('/owner')) return 'owner';
   if (path.match(/^\/r\//)) return 'customer';
+
+  // For root manifest/sw.js, use Referer header to know which page asked for it
+  const referer = req.get('Referer') || '';
+  if (referer) {
+    const refUrl = new URL(referer);
+    const refPath = refUrl.pathname;
+    if (refPath.startsWith('/owner')) return 'owner';
+    if (refPath.match(/^\/r\//)) return 'customer';
+  }
 
   // Subdomain/Render service detection (for separate-domain setup)
   const subdomain = getSubdomain(hostname);
