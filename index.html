@@ -28,10 +28,6 @@
       }
       document.title = appName + ' - Food Ordering';
       document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content', appName);
-      const manifestLink = document.querySelector('link[rel="manifest"]');
-      if (manifestLink) {
-        manifestLink.href = '/manifest.json?name=' + encodeURIComponent(appName);
-      }
     </script>
     <title>FoodApp - Food Ordering Platform</title>
     <meta name="description" content="Order delicious food from your favorite restaurants. Smart, fast, and easy food ordering platform." />
