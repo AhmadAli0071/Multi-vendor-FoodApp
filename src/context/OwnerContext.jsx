@@ -100,11 +100,15 @@ export const OwnerProvider = ({ children }) => {
     if (!isLoggedIn || !restaurant) return;
     const token = localStorage.getItem('owner_token');
     if (!token) return;
+    const clearedAt = localStorage.getItem(`clearedOrders_${restaurant.id}`);
     const fetchOrders = () => {
       fetch(`${API_BASE}/orders?restaurant_id=${restaurant.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).then(r => r.json()).then(d => {
-        if (d.success) setOrders(d.orders.map(normalizeOrder));
+        if (!d.success) return;
+        const cutoff = localStorage.getItem(`clearedOrders_${restaurant.id}`);
+        const orders = d.orders.map(normalizeOrder).filter(o => !cutoff || new Date(o.createdAt) > new Date(cutoff));
+        setOrders(orders);
       }).catch(() => {});
     };
     const interval = setInterval(fetchOrders, 10000);
@@ -189,7 +193,9 @@ export const OwnerProvider = ({ children }) => {
         });
         const ordersData = await ordersRes.json();
         if (ordersData.success) {
-          setOrders(ordersData.orders.map(normalizeOrder));
+          const cutoff = localStorage.getItem(`clearedOrders_${rest.id}`);
+          const filtered = ordersData.orders.map(normalizeOrder).filter(o => !cutoff || new Date(o.createdAt) > new Date(cutoff));
+          setOrders(filtered);
         } else {
           const savedOrders = localStorage.getItem(`orders_${rest.id}`);
           setOrders(savedOrders ? JSON.parse(savedOrders) : []);
@@ -337,7 +343,20 @@ export const OwnerProvider = ({ children }) => {
   };
 
   const updateRestaurant = async (data) => {
-    const updated = { ...restaurant, ...data };
+    const updated = {
+      ...restaurant,
+      ...data,
+      primary_color: data.primaryColor ?? restaurant?.primary_color,
+      secondary_color: data.secondaryColor ?? restaurant?.secondary_color,
+      delivery_available: data.deliveryAvailable ?? restaurant?.delivery_available,
+      pickup_available: data.pickupAvailable ?? restaurant?.pickup_available,
+      opening_time: data.openingTime ?? restaurant?.opening_time,
+      closing_time: data.closingTime ?? restaurant?.closing_time,
+      estimated_delivery_time: data.estimatedDeliveryTime ?? restaurant?.estimated_delivery_time,
+      min_order_amount: data.minOrderAmount ?? restaurant?.min_order_amount,
+      font_family: data.fontFamily ?? restaurant?.font_family,
+    };
+    ['primaryColor','secondaryColor','deliveryAvailable','pickupAvailable','openingTime','closingTime','estimatedDeliveryTime','minOrderAmount','fontFamily'].forEach(k => delete updated[k]);
     setRestaurant(updated);
     localStorage.setItem('owner_restaurant', JSON.stringify(updated));
 
@@ -367,6 +386,7 @@ export const OwnerProvider = ({ children }) => {
     setOrders([]);
     if (restaurant) {
       localStorage.setItem(`orders_${restaurant.id}`, JSON.stringify([]));
+      localStorage.setItem(`clearedOrders_${restaurant.id}`, new Date().toISOString());
     }
   };
 
@@ -378,7 +398,7 @@ export const OwnerProvider = ({ children }) => {
     todayOrders: orders.filter(o => o.createdAt?.startsWith(new Date().toISOString().split('T')[0])).length,
     pendingOrders: orders.filter(o => o.status === 'pending' || o.status === 'Pending').length,
     todayRevenue: orders
-      .filter(o => o.createdAt?.startsWith(new Date().toISOString().split('T')[0]))
+      .filter(o => o.createdAt?.startsWith(new Date().toISOString().split('T')[0]) && o.status === 'delivered')
       .reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0),
     totalItems: menu.categories?.reduce((sum, cat) => sum + (cat.items?.length || 0), 0) || 0
   };

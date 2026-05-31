@@ -151,7 +151,6 @@ const OwnerSettings = () => {
               <div className="flex justify-center">
                 <QRCodeSVG value={OWNER_URL} size={140} level="M" />
               </div>
-              <p className="text-[10px] text-gray-400 break-all font-mono">{OWNER_URL}</p>
               <button onClick={() => downloadQr('.owner-qr', `owner-qr-${restaurant.slug || 'panel'}.png`)}
                 className="w-full py-2 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
                 <Download size={12} /> Download
@@ -165,7 +164,6 @@ const OwnerSettings = () => {
               <div className="flex justify-center">
                 <QRCodeSVG value={customerUrl} size={140} level="M" />
               </div>
-              <p className="text-[10px] text-gray-400 break-all font-mono">{customerUrl}</p>
               <button onClick={() => downloadQr('.customer-qr', `customer-qr-${restaurant.slug || 'menu'}.png`)}
                 className="w-full py-2 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-600 flex items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
                 <Download size={12} /> Download
@@ -185,22 +183,22 @@ const OwnerSettings = () => {
           <h2 className="text-sm font-bold text-gray-800">Branding</h2>
         </div>
         <div className={sectionBodyClasses}>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 min-w-0">
               <label className={labelClasses}>Primary Color</label>
               <div className="flex gap-2">
                 <input type="color" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5" />
-                <input type="text" value={form.primaryColor.toUpperCase()} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
+                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
+                <input type="text" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
                   className="flex-1 px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none uppercase focus:bg-white focus:border-[#FF6B35]" />
               </div>
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <label className={labelClasses}>Secondary Color</label>
               <div className="flex gap-2">
                 <input type="color" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })}
-                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5" />
-                <input type="text" value={form.secondaryColor.toUpperCase()} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })}
+                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
+                <input type="text" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })}
                   className="flex-1 px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none uppercase focus:bg-white focus:border-[#FF6B35]" />
               </div>
             </div>
@@ -210,11 +208,15 @@ const OwnerSettings = () => {
           <div>
             <label className={labelClasses}>Logo</label>
             <div className="flex items-center gap-3">
-              <input type="text" value={!form.logo?.startsWith('data:image') && !form.logo?.startsWith('http') && !form.logo?.startsWith('/uploads') ? (form.logo || '') : ''}
-                onChange={(e) => setForm({ ...form, logo: e.target.value })}
-                placeholder="Emoji (e.g. 🍕)" className={`${inputClasses} flex-1`} />
-              <label className="flex-shrink-0 px-3 py-2.5 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-xs text-gray-500 cursor-pointer hover:border-[#FF6B35] hover:bg-orange-50 transition-colors flex items-center gap-1.5">
-                <Upload size={14} /> Image
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 overflow-hidden flex-shrink-0">
+                {form.logo && (form.logo.startsWith('data:') || form.logo.startsWith('http') || form.logo.startsWith('/uploads')) ? (
+                  <img src={form.logo} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-lg">{form.logo || '🍽️'}</span>
+                )}
+              </div>
+              <label className="flex-1 px-3 py-2.5 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-xs text-gray-500 cursor-pointer hover:border-[#FF6B35] hover:bg-orange-50 transition-colors flex items-center justify-center gap-1.5">
+                <Upload size={14} /> {form.logo ? 'Change' : 'Upload'} Image
                 <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                   const f = e.target.files?.[0]; if (!f) return;
                   setUploadingLogo(true);
@@ -223,12 +225,14 @@ const OwnerSettings = () => {
                   finally { setUploadingLogo(false); }
                 }} />
               </label>
-              {(form.logo && (form.logo.startsWith('data:image') || form.logo.startsWith('http') || form.logo.startsWith('/uploads'))) && (
-                <button onClick={() => { setForm({ ...form, logo: '' }); updateRestaurant({ ...form, logo: '' }); toast.success('Logo removed'); }}
+              {form.logo && (
+                <button onClick={() => { const f = { ...form, logo: '' }; setForm(f); updateRestaurant(f); toast.success('Logo removed'); }}
                   className="flex-shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-lg"><X size={16} /></button>
               )}
             </div>
-            {uploadingLogo && <p className="text-xs text-gray-400 mt-1">Uploading...</p>}
+            {!form.logo && <input type="text" value={form.logo || ''} onChange={(e) => setForm({ ...form, logo: e.target.value })}
+              placeholder="Or type an emoji (e.g. 🍕)" className={`${inputClasses} mt-2`} />}
+            {uploadingLogo && <p className="text-xs text-gray-400 mt-1.5">Uploading...</p>}
           </div>
 
           {/* Preview Toggle */}

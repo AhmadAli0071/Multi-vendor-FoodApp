@@ -61,6 +61,11 @@ const RestaurantPage = () => {
             <div className="min-w-0 flex-1 pt-0.5">
               <h1 className="text-lg font-extrabold leading-tight">{restaurant.name}</h1>
               <p className="text-white/70 text-[11px] mt-0.5 line-clamp-1">{restaurant.address}</p>
+              {restaurant.opening_time && restaurant.closing_time && (
+                <p className="text-white/70 text-[11px] mt-0.5 flex items-center gap-1">
+                  <Clock size={10} /> {restaurant.opening_time} - {restaurant.closing_time}
+                </p>
+              )}
               <div className="flex items-center gap-1.5 mt-1.5">
                 <Star size={11} className="fill-yellow-400 text-yellow-400" />
                 <span className="text-[11px] font-semibold">4.5</span>

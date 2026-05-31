@@ -28,7 +28,7 @@ router.get('/restaurant/:slug', async (req, res, next) => {
   try {
     const restaurant = await db.findRestaurantBySlug(req.params.slug);
     if (!restaurant) return res.status(404).json({ success: false, message: 'Restaurant not found' });
-    res.status(200).json({ success: true, restaurant: { id: restaurant.id, name: restaurant.name, slug: restaurant.slug, phone: restaurant.phone, whatsapp: restaurant.whatsapp, address: restaurant.address, primary_color: restaurant.primary_color, secondary_color: restaurant.secondary_color, font_family: restaurant.font_family, logo: restaurant.logo, delivery_available: restaurant.delivery_available, pickup_available: restaurant.pickup_available, active: restaurant.active, plan: restaurant.plan } });
+    res.status(200).json({ success: true, restaurant: { id: restaurant.id, name: restaurant.name, slug: restaurant.slug, phone: restaurant.phone, whatsapp: restaurant.whatsapp, address: restaurant.address, primary_color: restaurant.primary_color, secondary_color: restaurant.secondary_color, font_family: restaurant.font_family, logo: restaurant.logo, delivery_available: restaurant.delivery_available, pickup_available: restaurant.pickup_available, opening_time: restaurant.opening_time, closing_time: restaurant.closing_time, estimated_delivery_time: restaurant.estimated_delivery_time, active: restaurant.active, plan: restaurant.plan } });
   } catch (error) { next(error); }
 });
 

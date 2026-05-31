@@ -104,21 +104,6 @@ const OwnerLayout = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
-        {/* Payment ID Banner */}
-        {restaurant.payment_id && (
-          <div className="mx-4 mt-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-3 flex items-center justify-between">
-            <div className="min-w-0">
-              <p className="text-[10px] text-amber-600 font-medium">Payment ID</p>
-              <p className="text-xs font-bold text-amber-800 tracking-widest font-mono truncate">{restaurant.payment_id}</p>
-            </div>
-            <button
-              onClick={() => { navigator.clipboard.writeText(restaurant.payment_id); toast.success('Copied!'); }}
-              className="flex-shrink-0 ml-2 p-1.5 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
-            >
-              <Copy size={14} />
-            </button>
-          </div>
-        )}
         <div className="p-4 pb-24">
           {outlet}
         </div>
