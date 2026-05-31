@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { NavLink, useOutlet, Navigate } from 'react-router-dom';
+import { NavLink, useOutlet, Navigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, UtensilsCrossed, ClipboardList,
   Settings, Power, PowerOff, LogOut, Copy
@@ -14,6 +14,12 @@ import toast from 'react-hot-toast';
 const OwnerLayout = () => {
   const { restaurant, isOpen, isLoggedIn, toggleOpen, logout, orders, pendingAlerts, dismissAlert } = useOwner();
   const outlet = useOutlet();
+  const location = useLocation();
+
+  // Detect if on dedicated owner service (path is / not /owner)
+  const isDedicatedOwner = !location.pathname.startsWith('/owner');
+
+  const base = isDedicatedOwner ? '' : '/owner';
 
   const pendingCount = orders.filter(o => {
     const isPending = o.status === 'pending' || o.status === 'Pending';
@@ -24,7 +30,7 @@ const OwnerLayout = () => {
   }).length;
 
   if (!isLoggedIn || !restaurant) {
-    return <Navigate to="/owner/login" replace />;
+    return <Navigate to={`${base}/login`} replace />;
   }
 
   useEffect(() => {
@@ -41,10 +47,10 @@ const OwnerLayout = () => {
   };
 
   const navItems = [
-    { to: '/owner', icon: LayoutDashboard, label: 'Home' },
-    { to: '/owner/menu', icon: UtensilsCrossed, label: 'Menu' },
-    { to: '/owner/orders', icon: ClipboardList, label: 'Orders' },
-    { to: '/owner/settings', icon: Settings, label: 'Settings' }
+    { to: `${base}/`, icon: LayoutDashboard, label: 'Home' },
+    { to: `${base}/menu`, icon: UtensilsCrossed, label: 'Menu' },
+    { to: `${base}/orders`, icon: ClipboardList, label: 'Orders' },
+    { to: `${base}/settings`, icon: Settings, label: 'Settings' }
   ];
 
   const linkClasses = ({ isActive }) =>
@@ -125,7 +131,7 @@ const OwnerLayout = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === '/owner'}
+              end={item.to === `${base}/`}
               className={linkClasses}
             >
               <item.icon size={22} strokeWidth={1.8} />
