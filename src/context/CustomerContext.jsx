@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { API_BASE, WS_URL } from '../utils/config.js';
+import { API_BASE, WS_URL, OWNER_URL } from '../utils/config.js';
 
 const API = `${API_BASE}/customer`;
 
@@ -131,6 +131,12 @@ export const CustomerProvider = ({ children, slug: providerSlug }) => {
       const menuData = await menuRes.json();
 
       if (resData.success && resData.restaurant) {
+        // Fix relative logo URLs (cross-service uploads)
+        const fixLogo = (r) => {
+          if (r.logo && r.logo.startsWith('/uploads/')) r.logo = OWNER_URL ? `${OWNER_URL.replace(/\/owner$/,'')}${r.logo}` : r.logo;
+          return r;
+        };
+        fixLogo(resData.restaurant);
         // Merge API data with localStorage overrides (logo, branding)
         const localRests = (() => { try { return JSON.parse(localStorage.getItem('foodapp_restaurants')) || []; } catch { return []; } })();
         const localRest = localRests.find(r => r.slug === slug);
@@ -143,6 +149,7 @@ export const CustomerProvider = ({ children, slug: providerSlug }) => {
           if (localRest.whatsapp) mergedRest.whatsapp = localRest.whatsapp;
           if (localRest.address) mergedRest.address = localRest.address;
         }
+        fixLogo(mergedRest);
         setRestaurant(mergedRest);
         const apiMenu = menuData.menu || [];
         if (apiMenu.length > 0) {
