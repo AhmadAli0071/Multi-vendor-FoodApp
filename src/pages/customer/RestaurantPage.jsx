@@ -153,7 +153,11 @@ const RestaurantPage = () => {
                 className="flex-shrink-0 w-36 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer active:scale-95 transition-transform"
               >
                 <div className="h-24 bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center relative">
-                  <span className="text-4xl">{item.image || '🍽️'}</span>
+                  {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/uploads')) ? (
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-4xl">{item.image || '🍽️'}</span>
+                  )}
                   <span className="absolute top-2 left-2 bg-white text-pink-500 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">BEST</span>
                 </div>
                 <div className="p-2.5">
@@ -225,7 +229,11 @@ const RestaurantPage = () => {
             >
               {/* Image */}
               <div className="w-18 h-18 rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm relative" style={{ width: '64px', height: '64px' }}>
-                <span className="text-3xl">{item.image || '🍽️'}</span>
+                {item.image && (item.image.startsWith('data:') || item.image.startsWith('http') || item.image.startsWith('/uploads')) ? (
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl">{item.image || '🍽️'}</span>
+                )}
                 {item.popular && (
                   <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[8px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">★</span>
                 )}
