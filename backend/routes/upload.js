@@ -1,28 +1,17 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { v2 as cloudinary } from 'cloudinary';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Store uploads in backend/uploads folder
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
@@ -39,22 +28,31 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// POST /api/upload/public - Upload image without auth (for landing page)
+async function uploadToCloudinary(file) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'foodapp', resource_type: 'image' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    stream.end(file.buffer);
+  });
+}
+
 router.post('/public', upload.single('image'), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image file provided' });
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    const url = await uploadToCloudinary(req.file);
 
     res.json({
       success: true,
       data: {
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        url: fileUrl,
+        url,
         size: req.file.size,
         mimeType: req.file.mimetype
       }
@@ -64,43 +62,22 @@ router.post('/public', upload.single('image'), async (req, res, next) => {
   }
 });
 
-// POST /api/upload - Upload image, returns file URL and info
 router.post('/', protect, upload.single('image'), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image file provided' });
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    const url = await uploadToCloudinary(req.file);
 
     res.json({
       success: true,
       data: {
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        url: fileUrl,
+        url,
         size: req.file.size,
         mimeType: req.file.mimetype
       }
     });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// DELETE /api/upload/:filename - Delete image file
-router.delete('/:filename', protect, async (req, res, next) => {
-  try {
-    const { filename } = req.params;
-    const filePath = path.join(uploadsDir, filename);
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: 'File not found' });
-    }
-
-    fs.unlinkSync(filePath);
-    res.json({ success: true, message: 'File deleted' });
   } catch (error) {
     next(error);
   }
