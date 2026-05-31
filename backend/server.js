@@ -147,33 +147,40 @@ function getSubdomain(hostname) {
   return null;
 }
 
-// Dynamic manifest.json based on subdomain (for separate PWA apps)
-app.get('/manifest.json', (req, res) => {
-  const subdomain = getSubdomain(req.hostname);
-  const isAdmin = subdomain === 'admin';
-  const isOwner = subdomain === 'owner';
-  const isCustomer = subdomain === 'customer';
+// Detect app type from hostname + request path (all apps may share one domain)
+function getAppType(req) {
+  const path = req.path || '';
+  const hostname = req.hostname;
 
-  let name = 'FoodApp';
-  let shortName = 'FoodApp';
+  // Path-based detection (for single-domain setup)
+  if (path.startsWith('/owner')) return 'owner';
+  if (path.match(/^\/r\//)) return 'customer';
+
+  // Subdomain/Render service detection (for separate-domain setup)
+  const subdomain = getSubdomain(hostname);
+  if (subdomain === 'owner') return 'owner';
+  if (subdomain === 'customer') return 'customer';
+  return 'admin'; // default
+}
+
+// Dynamic manifest.json based on app type (for separate PWA apps)
+app.get('/manifest.json', (req, res) => {
+  const appType = getAppType(req);
+
+  let name = 'FoodApp Admin';
+  let shortName = 'Admin';
   let startUrl = '/';
 
-  if (isOwner) {
+  if (appType === 'owner') {
     name = 'FoodApp Owner';
     shortName = 'Owner';
     startUrl = '/owner';
-  } else if (isAdmin) {
-    name = 'FoodApp Admin';
-    shortName = 'Admin';
-  } else if (isCustomer) {
-    const originalSubdomain = getRenderServiceName(req.hostname) || getSubdomain(req.hostname);
-    if (originalSubdomain) {
-      name = originalSubdomain.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      shortName = name.length > 12 ? name.substring(0, 12) : name;
-    }
+  } else if (appType === 'customer') {
+    name = 'FoodApp';
+    shortName = 'FoodApp';
   }
 
-  res.json({
+  const manifest = {
     name, short_name: shortName,
     description: `FoodApp - ${name}`,
     start_url: startUrl, display: 'standalone',
@@ -190,15 +197,17 @@ app.get('/manifest.json', (req, res) => {
       { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
     ],
     categories: ['food', 'lifestyle'], lang: 'en'
-  });
+  };
+
+  res.json(manifest);
 });
 
-// Dynamic service worker based on subdomain (separate caches = separate PWA)
+// Dynamic service worker based on app type (separate caches = separate PWA)
 app.get('/sw.js', (req, res) => {
-  const subdomain = getSubdomain(req.hostname) || 'admin';
+  const appType = getAppType(req);
   res.type('application/javascript');
   res.send(`
-    const CACHE_NAME = 'foodapp-${subdomain}-v1';
+    const CACHE_NAME = 'foodapp-${appType}-v1';
     const ASSETS = ['/','/index.html','/manifest.json','/icons/icon-192.png','/icons/icon-512.png'];
     self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
     self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
