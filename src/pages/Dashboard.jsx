@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Store, ShoppingBag, ClipboardList, DollarSign, Clock, AlertTriangle, Package
+  Store, ShoppingBag, ClipboardList, DollarSign, Clock, AlertTriangle, Package, X, CheckCircle, Ban, Image as ImageIcon
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAppContext } from '../context/AppContext';
+import { API_BASE } from '../utils/config';
 import StatCard from '../components/StatCard';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { restaurants, orders, stats } = useAppContext();
@@ -65,6 +67,47 @@ const Dashboard = () => {
 
   const formatPKR = (amount) => `PKR ${(amount || 0).toLocaleString()}`;
 
+  // Payment Proofs
+  const [paymentProofs, setPaymentProofs] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
+  useEffect(() => {
+    const fetchProofs = async () => {
+      try {
+        const t = localStorage.getItem('admin_token');
+        const res = await fetch(`${API_BASE}/payment-proofs/pending`, { headers: { 'Authorization': `Bearer ${t}` } });
+        const data = await res.json();
+        if (data.success) setPaymentProofs(data.proofs);
+      } catch (err) { /* */ }
+    };
+    fetchProofs();
+  }, []);
+
+  const handleApproveProof = async (proofId) => {
+    try {
+      const t = localStorage.getItem('admin_token');
+      const r = await fetch(`${API_BASE}/payment-proofs/${proofId}/approve`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` } });
+      const d = await r.json();
+      if (d.success) { toast.success(d.message); setPaymentProofs(prev => prev.filter(p => p._id !== proofId)); } else throw new Error(d.message);
+    } catch (err) { toast.error(err.message || 'Failed'); }
+  };
+
+  const handleRejectProof = async (proofId) => {
+    try {
+      const t = localStorage.getItem('admin_token');
+      const r = await fetch(`${API_BASE}/payment-proofs/${proofId}/reject`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` }, body: JSON.stringify({ note: 'Rejected' }) });
+      const d = await r.json();
+      if (d.success) { toast.success('Rejected'); setPaymentProofs(prev => prev.filter(p => p._id !== proofId)); } else throw new Error(d.message);
+    } catch (err) { toast.error(err.message || 'Failed'); }
+  };
+
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('data:')) return url;
+    if (url.startsWith('http')) return url;
+    const base = API_BASE.replace('/api', '');
+    return `${base}${url}`;
+  };
+
   const StatusBadge = ({ status }) => {
     const s = (status || '').toLowerCase();
     const styles = {
@@ -85,6 +128,39 @@ const Dashboard = () => {
         <StatCard icon={ClipboardList} label="Today's Orders" value={stats.todayOrders} color="orange" />
         <StatCard icon={DollarSign} label="Monthly Revenue" value={formatPKR(stats.monthlyRevenue)} color="green" />
       </div>
+
+      {/* Pending Payment Proofs */}
+      {paymentProofs.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <ImageIcon size={20} className="text-[#FF6B35]" /> Pending Payment Proofs ({paymentProofs.length})
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paymentProofs.map(proof => (
+              <div key={proof._id} className="border border-gray-200 rounded-xl p-4">
+                <div className="mb-3">
+                  <p className="font-bold text-gray-800">{proof.restaurant_name}</p>
+                  <p className="text-sm text-gray-500">{proof.plan} Plan</p>
+                  <p className="text-lg font-bold text-[#FF6B35] mt-1">PKR {proof.amount.toLocaleString()}</p>
+                  <p className="text-xs text-gray-400">~{proof.months_to_add} month(s)</p>
+                </div>
+                {proof.image && (
+                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-40 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} />
+                )}
+                <div className="flex gap-2">
+                  <button onClick={() => handleApproveProof(proof._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-green-700">
+                    <CheckCircle size={16} /> Approve
+                  </button>
+                  <button onClick={() => handleRejectProof(proof._id)} className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium flex items-center gap-1.5 hover:bg-red-100">
+                    <Ban size={16} /> Reject
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">{new Date(proof.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Orders */}
@@ -180,6 +256,18 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPreviewImage(null)}>
+          <div className="relative max-w-4xl w-full max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setPreviewImage(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
+              <X size={28} />
+            </button>
+            <img src={previewImage} alt="Payment proof full" className="w-full h-auto max-h-[85vh] object-contain rounded-lg" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -13,6 +13,9 @@ const Subscriptions = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [renewData, setRenewData] = useState({ months: 1, paymentMethod: 'Cash' });
 
+  // Image preview modal
+  const [previewImage, setPreviewImage] = useState(null);
+
   // Payment Proofs
   const [paymentProofs, setPaymentProofs] = useState([]);
   const fetchProofs = async () => {
@@ -40,6 +43,14 @@ const Subscriptions = () => {
     } catch (err) { toast.error(err.message || 'Failed'); }
   };
   useEffect(() => { fetchProofs(); }, []);
+
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('data:')) return url;
+    if (url.startsWith('http')) return url;
+    const base = API_BASE.replace('/api', '');
+    return `${base}${url}`;
+  };
 
   const sortedRestaurants = [...restaurants].sort((a, b) => new Date(a.subscriptionEnd) - new Date(b.subscriptionEnd));
   const planPrices = { Starter: 2999, Business: 5999, Premium: 9999 };
@@ -101,7 +112,7 @@ const Subscriptions = () => {
                   </div>
                 </div>
                 {proof.image && (
-                  <img src={proof.image} alt="Payment proof" className="w-full rounded-lg border max-h-64 object-cover mb-3 cursor-pointer" onClick={() => window.open(proof.image)} />
+                  <img src={getImageUrl(proof.image)} alt="Payment proof" className="w-full rounded-lg border max-h-64 object-contain mb-3 cursor-pointer bg-gray-100" onClick={() => setPreviewImage(getImageUrl(proof.image))} />
                 )}
                 <div className="flex gap-2">
                   <button onClick={() => handleApproveProof(proof._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-green-700">
@@ -164,6 +175,18 @@ const Subscriptions = () => {
       {/* History Modal */}
       {showHistoryModal && selectedRestaurant && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"><div className="bg-white rounded-xl max-w-md w-full p-6"><div className="flex justify-between items-center mb-6"><div><h2 className="text-xl font-bold text-gray-900">Payment History</h2><p className="text-sm text-gray-500">{selectedRestaurant.name}</p></div><button onClick={() => setShowHistoryModal(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button></div><div className="space-y-3 text-center text-gray-500 py-8">No payment history available</div><div className="mt-6"><button onClick={() => setShowHistoryModal(false)} className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium">Close</button></div></div></div>
+      )}
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPreviewImage(null)}>
+          <div className="relative max-w-4xl w-full max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setPreviewImage(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
+              <X size={28} />
+            </button>
+            <img src={previewImage} alt="Payment proof full" className="w-full h-auto max-h-[85vh] object-contain rounded-lg" />
+          </div>
+        </div>
       )}
     </div>
   );

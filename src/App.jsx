@@ -17,7 +17,6 @@ const RestaurantDetail = lazy(() => import('./pages/RestaurantDetail'));
 const AllOrders = lazy(() => import('./pages/AllOrders'));
 const Subscriptions = lazy(() => import('./pages/Subscriptions'));
 const Broadcast = lazy(() => import('./pages/Broadcast'));
-const Settings = lazy(() => import('./pages/Settings'));
 const PaymentSettingsPage = lazy(() => import('./pages/PaymentSettings'));
 const RestaurantPage = lazy(() => import('./pages/customer/RestaurantPage'));
 const CartPage = lazy(() => import('./pages/customer/CartPage'));
@@ -140,7 +139,6 @@ function PathBasedRoutes() {
               <Route path="/orders" element={<AllOrders />} />
               <Route path="/subscriptions" element={<Subscriptions />} />
               <Route path="/broadcast" element={<Broadcast />} />
-              <Route path="/settings" element={<Settings />} />
               <Route path="/payment-settings" element={<PaymentSettingsPage />} />
             </Routes>
           </Layout>

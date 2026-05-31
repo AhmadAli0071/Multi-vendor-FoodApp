@@ -39,6 +39,30 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
+// POST /api/upload/public - Upload image without auth (for landing page)
+router.post('/public', upload.single('image'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No image file provided' });
+    }
+
+    const fileUrl = `/uploads/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      data: {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        url: fileUrl,
+        size: req.file.size,
+        mimeType: req.file.mimetype
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // POST /api/upload - Upload image, returns file URL and info
 router.post('/', protect, upload.single('image'), async (req, res, next) => {
   try {

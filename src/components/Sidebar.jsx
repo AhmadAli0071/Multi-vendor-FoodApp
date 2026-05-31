@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Store, PlusCircle, ClipboardList,
-  CreditCard, Megaphone, Settings, X
+  CreditCard, Megaphone, X
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -15,8 +15,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { path: '/orders', icon: ClipboardList, label: 'All Orders' },
     { path: '/subscriptions', icon: CreditCard, label: 'Subscriptions' },
     { path: '/payment-settings', icon: CreditCard, label: 'Payment Settings' },
-    { path: '/broadcast', icon: Megaphone, label: 'Broadcast' },
-    { path: '/settings', icon: Settings, label: 'Settings' }
+    { path: '/broadcast', icon: Megaphone, label: 'Broadcast' }
   ];
 
   return (
