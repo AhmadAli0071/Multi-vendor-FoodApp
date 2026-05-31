@@ -24,7 +24,7 @@ router.put('/:id/status', protect, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    const validStatuses = ['pending', 'accepted', 'preparing', 'ready', 'delivered'];
+    const validStatuses = ['pending', 'accepted', 'preparing', 'ready', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) return res.status(400).json({ success: false, message: 'Invalid status' });
 
     const { authorized, order, error } = await authorizeOrderAccess(req.user, id);

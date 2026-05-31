@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Phone, MapPin, ChevronDown, ChevronUp, Clock, CheckCircle, Package, Truck, CookingPot } from 'lucide-react';
+import { Search, Phone, MapPin, ChevronDown, ChevronUp, Clock, CheckCircle, Package, Truck, CookingPot, X } from 'lucide-react';
 import { useOwner } from '../../context/OwnerContext';
 import toast from 'react-hot-toast';
 
@@ -24,7 +24,8 @@ const OwnerOrders = () => {
       accepted: 'bg-blue-100 text-blue-800', Accepted: 'bg-blue-100 text-blue-800',
       preparing: 'bg-orange-100 text-orange-800', Preparing: 'bg-orange-100 text-orange-800',
       ready: 'bg-green-100 text-green-800', Ready: 'bg-green-100 text-green-800',
-      delivered: 'bg-gray-100 text-gray-800', Delivered: 'bg-gray-100 text-gray-800'
+      delivered: 'bg-gray-100 text-gray-800', Delivered: 'bg-gray-100 text-gray-800',
+      cancelled: 'bg-red-100 text-red-800', Cancelled: 'bg-red-100 text-red-800'
     };
     return (
       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${styles[status] || styles.pending}`}>
@@ -35,7 +36,8 @@ const OwnerOrders = () => {
 
   const getNextStatus = (current) => {
     const flow = { pending: 'accepted', accepted: 'preparing', preparing: 'ready', ready: 'delivered' };
-    return flow[current.toLowerCase()] || null;
+    const c = current.toLowerCase();
+    return c === 'cancelled' || c === 'delivered' ? null : flow[c] || null;
   };
 
   const getNextLabel = (current) => {
@@ -53,8 +55,8 @@ const OwnerOrders = () => {
   });
 
   const formatPKR = (amount) => `PKR ${amount.toLocaleString()}`;
-  const getStatusStep = (status) => ['pending', 'accepted', 'preparing', 'ready', 'delivered'].indexOf(status.toLowerCase());
-  const statusIcons = { pending: Clock, accepted: CheckCircle, preparing: CookingPot, ready: Package, delivered: Truck };
+  const getStatusStep = (status) => ['pending', 'accepted', 'preparing', 'ready', 'delivered', 'cancelled'].indexOf(status.toLowerCase());
+  const statusIcons = { pending: Clock, accepted: CheckCircle, preparing: CookingPot, ready: Package, delivered: Truck, cancelled: X };
 
   return (
     <div className="space-y-4">
@@ -174,7 +176,7 @@ const OwnerOrders = () => {
                           {nextLabel} Order
                         </button>
                         {order.status.toLowerCase() === 'pending' && (
-                          <button onClick={() => handleStatusUpdate(order.id, 'delivered')}
+                          <button onClick={() => handleStatusUpdate(order.id, 'cancelled')}
                             className="px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-medium active:bg-red-100">
                             Reject
                           </button>

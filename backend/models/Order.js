@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema({
   total: { type: Number, default: 0 },
   subtotal: { type: Number, default: 0 },
   delivery_fee: { type: Number, default: 0 },
-  status: { type: String, enum: ['pending', 'accepted', 'preparing', 'ready', 'delivered'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'accepted', 'preparing', 'ready', 'delivered', 'cancelled'], default: 'pending' },
   order_type: { type: String, enum: ['delivery', 'pickup'], default: 'delivery' },
   address: { type: String, default: '' },
   notes: { type: String, default: '' },

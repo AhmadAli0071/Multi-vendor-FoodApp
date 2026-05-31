@@ -19,6 +19,7 @@ class Database {
       ];
     }
     if (filters.plan) query.plan = filters.plan;
+    if (filters.active !== undefined) query.active = filters.active;
     return Restaurant.find(query).sort({ created_at: -1 }).lean();
   }
 

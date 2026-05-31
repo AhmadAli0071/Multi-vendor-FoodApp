@@ -8,6 +8,21 @@ import { sendNewOrderWhatsApp } from '../services/whatsapp.js';
 
 const router = express.Router();
 
+// GET /api/customer/restaurants - List all active restaurants
+router.get('/restaurants', async (req, res, next) => {
+  try {
+    const restaurants = await db.findAllRestaurants({ active: true });
+    const list = (restaurants || []).map(r => ({
+      id: r.id, name: r.name, slug: r.slug, phone: r.phone,
+      address: r.address, primary_color: r.primary_color,
+      secondary_color: r.secondary_color, logo: r.logo,
+      delivery_available: r.delivery_available,
+      pickup_available: r.pickup_available, plan: r.plan
+    }));
+    res.status(200).json({ success: true, restaurants: list });
+  } catch (error) { next(error); }
+});
+
 // GET /api/customer/restaurant/:slug
 router.get('/restaurant/:slug', async (req, res, next) => {
   try {

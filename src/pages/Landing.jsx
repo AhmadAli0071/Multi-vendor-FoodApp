@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CreditCard, Upload, CheckCircle, AlertCircle, Utensils, Shield, Zap } from 'lucide-react';
+import { Search, CreditCard, Upload, CheckCircle, AlertCircle, Utensils, Shield, Zap, Store, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { API_BASE } from '../utils/config';
 import toast from 'react-hot-toast';
 
@@ -9,6 +10,8 @@ const Landing = () => {
   const [restaurant, setRestaurant] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState(null);
   const [error, setError] = useState('');
+  const [restaurants, setRestaurants] = useState([]);
+  const [loadingRestaurants, setLoadingRestaurants] = useState(true);
 
   const [selectedMethod, setSelectedMethod] = useState('');
   const [amount, setAmount] = useState('');
@@ -17,7 +20,11 @@ const Landing = () => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    console.log('Landing page mounted - ready for lookup');
+    fetch(`${API_BASE}/customer/restaurants`)
+      .then(r => r.json())
+      .then(d => { if (d.success) setRestaurants(d.restaurants || []); })
+      .catch(() => {})
+      .finally(() => setLoadingRestaurants(false));
   }, []);
 
   const handleSearch = async () => {
@@ -334,6 +341,37 @@ const Landing = () => {
               Check Another Payment ID
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Restaurant List */}
+      {!restaurant && !error && !submitted && restaurants.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 pb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Store size={22} className="text-[#FF6B35]" />
+            Browse Restaurants
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {restaurants.map(r => (
+              <Link key={r.id} to={`/r/${r.slug}`}
+                className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ backgroundColor: r.primary_color || '#FF6B35' }}>
+                  <span className="text-white">{r.logo && r.logo.length < 5 ? r.logo : '🍽️'}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-gray-800 text-sm truncate">{r.name}</h3>
+                  <p className="text-xs text-gray-400 truncate">{r.address || 'No address'}</p>
+                </div>
+                <ChevronRight size={18} className="text-gray-300 group-hover:text-[#FF6B35] transition-colors flex-shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+      {!restaurant && !error && !submitted && !loadingRestaurants && restaurants.length === 0 && (
+        <div className="max-w-4xl mx-auto px-4 pb-8 text-center">
+          <Store size={32} className="text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-400">No restaurants available yet</p>
         </div>
       )}
 

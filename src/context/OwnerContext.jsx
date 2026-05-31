@@ -39,6 +39,7 @@ export const OwnerProvider = ({ children }) => {
   const [apiAvailable, setApiAvailable] = useState(true);
   const menuRef = useRef(menu);
   menuRef.current = menu;
+  const syncTimeoutRef = useRef(null);
   const [socket, setSocket] = useState(null);
   const [pendingAlerts, setPendingAlerts] = useState([]); // new order popup alerts
   const socketRef = useRef(null);
@@ -210,26 +211,33 @@ export const OwnerProvider = ({ children }) => {
     setOrders([]);
   };
 
-  // Sync menu to API
-  const syncMenu = async () => {
-    if (!apiAvailable || !restaurant) return;
-    const token = localStorage.getItem('owner_token');
-    if (!token) return;
+  // Sync menu to API (debounced)
+  const syncMenu = () => {
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(async () => {
+      if (!apiAvailable || !restaurant) return;
+      const token = localStorage.getItem('owner_token');
+      if (!token) return;
 
-    try {
-      const currentCategories = menuRef.current?.categories || [];
-      const res = await fetch(`${API_BASE}/menu`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ categories: currentCategories })
-      });
-      if (!res.ok) setApiAvailable(false);
-    } catch {
-      setApiAvailable(false);
-    }
+      try {
+        const currentCategories = menuRef.current?.categories || [];
+        const res = await fetch(`${API_BASE}/menu`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ categories: currentCategories })
+        });
+        if (!res.ok) {
+          setApiAvailable(false);
+          toast.error('Menu save failed — changes only saved locally');
+        }
+      } catch {
+        setApiAvailable(false);
+        toast.error('Menu save failed — changes only saved locally');
+      }
+    }, 600);
   };
 
   const addCategory = (category) => {
@@ -320,7 +328,7 @@ export const OwnerProvider = ({ children }) => {
     if (!apiAvailable) return;
 
     try {
-      const res = await fetch(`${API_BASE}/restaurants/${restaurant.id}`, {
+      const res = await fetch(`${API_BASE}/restaurants/me`, {
         method: 'PUT',
         headers: getAuthHeader(),
         body: JSON.stringify(data)
