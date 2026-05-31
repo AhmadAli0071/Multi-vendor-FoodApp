@@ -46,7 +46,8 @@ router.post('/public', upload.single('image'), async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No image file provided' });
     }
 
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
 
     res.json({
       success: true,
@@ -70,7 +71,8 @@ router.post('/', protect, upload.single('image'), async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No image file provided' });
     }
 
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
 
     res.json({
       success: true,
