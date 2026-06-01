@@ -4,6 +4,15 @@ import { useCustomer, useCustomerSlug } from '../../context/CustomerContext';
 import { MapPin, User, CheckCircle, ShoppingBag, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}
+
 const CheckoutPage = () => {
   const slug = useCustomerSlug();
   const navigate = useNavigate();
@@ -20,6 +29,29 @@ const CheckoutPage = () => {
     if (orderType === 'delivery' && !form.address.trim()) return toast.error('Enter delivery address');
     if (cart.items.length === 0) return toast.error('Cart is empty');
 
+    // Step 1: Request push permission EARLY (before any await — preserves user gesture)
+    let pushSubData = null;
+    try {
+      if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          const pkRes = await fetch(`${API_BASE}/push/vapid-public-key`);
+          const { publicKey } = await pkRes.json();
+          if (publicKey) {
+            const reg = await navigator.serviceWorker.ready;
+            let sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+              sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+              });
+            }
+            pushSubData = { subscription: sub.toJSON(), type: 'customer' };
+          }
+        }
+      }
+    } catch (_) { /* non-blocking */ }
+
     setSubmitting(true);
     try {
       const result = await placeOrder({
@@ -31,8 +63,18 @@ const CheckoutPage = () => {
         notes: form.notes, customer_id: customer?.id || null
       });
       clearCart();
-      // Register push notifications for order updates
-      import('../../utils/push.js').then(m => m.registerPushSubscription('customer', result.order.id)).catch(() => {});
+      // Register push subscription on server with order ID
+      if (pushSubData && result?.order?.id) {
+        pushSubData.order_id = result.order.id;
+        fetch(`${API_BASE}/push/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pushSubData)
+        }).then(r => r.json()).then(d => {
+          if (d.success) console.log('Push subscribed for order');
+          else console.warn('Push subscribe failed:', d.message);
+        }).catch(e => console.warn('Push subscribe error:', e));
+      }
       toast.success('Order placed!');
       navigate(nav(`/order/${result.order.id}`));
     } catch (err) {

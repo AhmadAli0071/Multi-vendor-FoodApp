@@ -10,7 +10,7 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return Promise.allSettled(ASSETS.map(a => cache.add(a).catch(() => {})));
     })
   );
   self.skipWaiting();

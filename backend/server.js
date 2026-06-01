@@ -248,7 +248,7 @@ function serveSw(res, appType, hostname) {
   res.send(`
     const CACHE_NAME = 'foodapp-${appType}-v1';
     const ASSETS = ['/','/index.html','${manifestUrl}','/icons/icon-192.png','/icons/icon-512.png'];
-    self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting();});
+    self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>Promise.allSettled(ASSETS.map(a=>c.add(a).catch(()=>{})))));self.skipWaiting();});
     self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))));self.clients.claim();});
     self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||e.request.url.includes('/api/')||!e.request.url.startsWith(self.location.origin))return;e.respondWith(caches.match(e.request).then(c=>{let f=fetch(e.request).then(r=>{if(r&&r.status===200&&r.type==='basic'){let cl=r.clone();caches.open(CACHE_NAME).then(ca=>ca.put(e.request,cl))}return r}).catch(()=>{if(e.request.mode==='navigate')return caches.match('/');return c});return c||f}));});
     self.addEventListener('push',e=>{const d=e.data?e.data.json():{};e.waitUntil(self.registration.showNotification(d.title||'FoodApp',{body:d.body||'',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[200,100,200],requireInteraction:true,silent:false,tag:d.tag||'order',data:{url:d.url||'/'}}));});

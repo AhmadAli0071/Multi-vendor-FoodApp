@@ -5,6 +5,13 @@ import toast from 'react-hot-toast';
 
 const OwnerContext = createContext();
 
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}
+
 export const useOwner = () => {
   const context = useContext(OwnerContext);
   if (!context) throw new Error('useOwner must be used within an OwnerProvider');
@@ -147,6 +154,29 @@ export const OwnerProvider = ({ children }) => {
 
   // Login via API
   const login = async (email, password) => {
+    // Step 1: Request push permission EARLY (before any await — preserves user gesture)
+    let pushSubData = null;
+    try {
+      if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          const pkRes = await fetch(`${API_BASE}/push/vapid-public-key`);
+          const { publicKey } = await pkRes.json();
+          if (publicKey) {
+            const reg = await navigator.serviceWorker.ready;
+            let sub = await reg.pushManager.getSubscription();
+            if (!sub) {
+              sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+              });
+            }
+            pushSubData = { subscription: sub.toJSON(), type: 'owner' };
+          }
+        }
+      }
+    } catch (_) { /* non-blocking */ }
+
     try {
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
@@ -209,8 +239,18 @@ export const OwnerProvider = ({ children }) => {
       const savedIsOpen = localStorage.getItem(`isOpen_${rest.id}`);
       setIsOpen(savedIsOpen !== null ? savedIsOpen === 'true' : true);
 
-      // Register push notifications (async, non-blocking)
-      import('../utils/push.js').then(m => m.registerPushSubscription('owner', rest.id)).catch(() => {});
+      // Register push subscription on server with restaurant ID
+      if (pushSubData && rest?.id) {
+        pushSubData.restaurant_id = rest.id;
+        fetch(`${API_BASE}/push/subscribe`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pushSubData)
+        }).then(r => r.json()).then(d => {
+          if (d.success) console.log('Push subscribed for owner');
+          else console.warn('Push subscribe failed:', d.message);
+        }).catch(e => console.warn('Push subscribe error:', e));
+      }
 
       return { success: true };
     } catch (error) {
