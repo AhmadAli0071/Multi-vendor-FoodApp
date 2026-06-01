@@ -178,6 +178,7 @@ function AppContent() {
     return <OwnerSubdomainRoutes />;
   }
 
+  // Render main service ke liye landing page
   if (appType === 'landing') {
     return <PublicRoutes />;
   }
