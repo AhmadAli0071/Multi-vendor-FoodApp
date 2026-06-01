@@ -178,7 +178,7 @@ function AppContent() {
     return <OwnerSubdomainRoutes />;
   }
 
-  if (appType === 'landing' && !serviceName) {
+  if (appType === 'landing') {
     return <PublicRoutes />;
   }
 
