@@ -118,18 +118,26 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
       {/* Hero */}
-      <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] to-[#E63946] opacity-[0.03] pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 relative z-10">
+      <header className="relative overflow-hidden min-h-[60vh] flex items-center">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70" />
+        </div>
+        <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 relative z-10 w-full">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow-sm border border-orange-100 mb-6">
-              <Utensils size={18} className="text-[#FF6B35]" />
-              <span className="text-sm font-medium text-gray-600">Food App Payment Portal</span>
+            <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur px-4 py-2 rounded-full shadow-sm border border-white/20 mb-6">
+              <Utensils size={18} className="text-orange-400" />
+              <span className="text-sm font-medium text-white/80">E Dunia — Payment Portal</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4 tracking-tight">
-              Manage Your <span className="text-[#FF6B35]">Subscription</span>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">
+              Manage Your <span className="text-orange-400">Subscription</span>
             </h1>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
+            <p className="text-lg text-white/70 max-w-xl mx-auto mb-10">
               Enter your unique Payment ID to view your subscription status, pay dues, and upload proof.
             </p>
 
@@ -412,7 +420,7 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-8 text-center text-sm">
-        <p>&copy; 2026 Food App. All rights reserved.</p>
+        <p>&copy; 2026 E Dunia. All rights reserved.</p>
       </footer>
     </div>
   );
