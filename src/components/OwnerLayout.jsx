@@ -57,34 +57,28 @@ const OwnerLayout = () => {
       isActive ? 'text-[#FF6B35]' : 'text-gray-400'
     }`;
 
-  const primaryColor = restaurant.primary_color || restaurant.primaryColor || '#FF6B35';
-  const primaryTextColor = restaurant.primary_text_color || '#FFFFFF';
-
   return (
     <div className="h-dvh flex flex-col bg-gray-50 max-w-lg mx-auto relative overflow-hidden shadow-2xl">
       {/* Top Header */}
-      <header
-        className="sticky top-0 z-50 safe-top"
-        style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}
-      >
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
+      <header className="sticky top-0 z-50 safe-top bg-white/70 backdrop-blur-xl border-b border-gray-200/60">
+        <div className="flex items-center justify-between px-4 py-2.5">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
               {restaurant.logo && (restaurant.logo.startsWith('data:image') || restaurant.logo.startsWith('http')) ? (
                 <img src={restaurant.logo} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-2xl drop-shadow-sm">{restaurant.logo || '🍔'}</span>
+                <span className="text-xl">{restaurant.logo || '🍔'}</span>
               )}
             </div>
             <div className="min-w-0">
-              <h1 className="font-extrabold text-base leading-tight truncate max-w-[130px] sm:max-w-[180px] drop-shadow-sm" style={{ color: primaryTextColor }}>{restaurant.name}</h1>
-              <div className="flex items-center gap-2 mt-1">
-                <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-300' : 'bg-red-300'}`} />
-                <span className="text-[11px] font-semibold drop-shadow-sm" style={{ color: primaryTextColor }}>{isOpen ? 'Open' : 'Closed'}</span>
+              <h1 className="font-extrabold text-sm leading-tight truncate max-w-[130px] sm:max-w-[180px] text-gray-900">{restaurant.name}</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className={`w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-[11px] font-medium text-gray-500">{isOpen ? 'Open' : 'Closed'}</span>
                 {restaurant.phone && (
                   <>
-                    <span className="text-[10px] opacity-50" style={{ color: primaryTextColor }}>|</span>
-                    <span className="text-[10px] font-medium opacity-80 drop-shadow-sm" style={{ color: primaryTextColor }}>{restaurant.phone}</span>
+                    <span className="text-[10px] text-gray-300">|</span>
+                    <span className="text-[10px] text-gray-400">{restaurant.phone}</span>
                   </>
                 )}
               </div>
@@ -94,24 +88,21 @@ const OwnerLayout = () => {
             <NotificationBell pendingCount={pendingCount} navigateTo={`${base}/orders`} />
             <button
               onClick={toggleOpen}
-              className={`p-2 rounded-xl transition-all duration-200 ${
+              className={`p-2 rounded-xl transition-all duration-200 active:scale-95 ${
                 isOpen
-                  ? 'bg-white/10 hover:bg-white/20 active:scale-95'
-                  : 'bg-white/20 hover:bg-white/30 active:scale-95'
+                  ? 'bg-gray-100 hover:bg-gray-200 text-green-600'
+                  : 'bg-gray-100 hover:bg-gray-200 text-red-500'
               }`}
               title={isOpen ? 'Close Store' : 'Open Store'}
             >
-              {isOpen
-                ? <Power size={17} className="text-green-300" />
-                : <PowerOff size={17} className="text-red-300" />
-              }
+              {isOpen ? <Power size={17} /> : <PowerOff size={17} />}
             </button>
             <button
               onClick={handleLogout}
-              className="p-2 rounded-xl hover:bg-white/10 active:scale-95 transition-all duration-200"
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-200 text-gray-500"
               title="Logout"
             >
-              <LogOut size={17} style={{ color: primaryTextColor }} />
+              <LogOut size={17} />
             </button>
           </div>
         </div>
