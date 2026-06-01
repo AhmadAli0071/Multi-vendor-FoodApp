@@ -120,11 +120,12 @@ const Landing = () => {
       {/* Hero */}
       <header className="relative overflow-hidden min-h-[60vh] flex items-center">
         {/* Background Image */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-900 via-red-900 to-amber-900">
           <img
-            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&q=80"
+            src="https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-50"
+            onError={(e) => e.target.style.display = 'none'}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70" />
         </div>
