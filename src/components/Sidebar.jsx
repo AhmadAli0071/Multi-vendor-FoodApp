@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Store, PlusCircle, ClipboardList,
+  LayoutDashboard, Store, PlusCircle,
   CreditCard, Megaphone, X
 } from 'lucide-react';
 
@@ -12,7 +12,6 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/restaurants', icon: Store, label: 'All Restaurants' },
     { path: '/add-restaurant', icon: PlusCircle, label: 'Add Restaurant' },
-    { path: '/orders', icon: ClipboardList, label: 'All Orders' },
     { path: '/subscriptions', icon: CreditCard, label: 'Subscriptions' },
     { path: '/payment-settings', icon: CreditCard, label: 'Payment Settings' },
     { path: '/broadcast', icon: Megaphone, label: 'Broadcast' }
