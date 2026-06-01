@@ -68,21 +68,25 @@ const OwnerLayout = () => {
         style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}
       >
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shadow-md ring-2 ring-white/20 flex-shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shadow-inner flex-shrink-0">
               {restaurant.logo && (restaurant.logo.startsWith('data:image') || restaurant.logo.startsWith('http')) ? (
                 <img src={restaurant.logo} alt="Logo" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-2xl">{restaurant.logo || '🍔'}</span>
+                <span className="text-2xl drop-shadow-sm">{restaurant.logo || '🍔'}</span>
               )}
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-3.5 py-2 min-w-0 border border-white/10">
-              <h1 className="font-bold text-sm leading-tight truncate max-w-[120px] sm:max-w-[170px]" style={{ color: primaryTextColor }}>{restaurant.name}</h1>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400 shadow-sm shadow-green-300/50' : 'bg-red-400 shadow-sm shadow-red-300/50'}`} />
-                <span className="text-[11px] font-semibold opacity-90" style={{ color: primaryTextColor }}>{isOpen ? 'Open' : 'Closed'}</span>
-                <span className="text-[10px] opacity-60 ml-0.5" style={{ color: primaryTextColor }}>·</span>
-                <span className="text-[10px] opacity-80 hidden sm:inline font-medium" style={{ color: primaryTextColor }}>{restaurant.phone || ''}</span>
+            <div className="min-w-0">
+              <h1 className="font-extrabold text-base leading-tight truncate max-w-[130px] sm:max-w-[180px] drop-shadow-sm" style={{ color: primaryTextColor }}>{restaurant.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-300' : 'bg-red-300'}`} />
+                <span className="text-[11px] font-semibold drop-shadow-sm" style={{ color: primaryTextColor }}>{isOpen ? 'Open' : 'Closed'}</span>
+                {restaurant.phone && (
+                  <>
+                    <span className="text-[10px] opacity-50" style={{ color: primaryTextColor }}>|</span>
+                    <span className="text-[10px] font-medium opacity-80 drop-shadow-sm" style={{ color: primaryTextColor }}>{restaurant.phone}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
