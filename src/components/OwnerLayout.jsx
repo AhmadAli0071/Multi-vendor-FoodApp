@@ -16,7 +16,6 @@ const OwnerLayout = () => {
   const outlet = useOutlet();
   const location = useLocation();
 
-  // Detect if on dedicated owner service (path is / not /owner)
   const isDedicatedOwner = !location.pathname.startsWith('/owner');
 
   const base = isDedicatedOwner ? '' : '/owner';
@@ -59,46 +58,58 @@ const OwnerLayout = () => {
     }`;
 
   const primaryColor = restaurant.primary_color || restaurant.primaryColor || '#FF6B35';
+  const primaryTextColor = restaurant.primary_text_color || '#FFFFFF';
 
   return (
-    <div className="h-dvh flex flex-col bg-gray-100 max-w-lg mx-auto relative overflow-hidden shadow-2xl">
-      {/* Top Bar */}
+    <div className="h-dvh flex flex-col bg-gray-50 max-w-lg mx-auto relative overflow-hidden shadow-2xl">
+      {/* Top Header */}
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 text-white safe-top"
-        style={{ backgroundColor: primaryColor }}
+        className="sticky top-0 z-50 safe-top"
+        style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}
       >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center text-lg overflow-hidden">
-            {restaurant.logo && (restaurant.logo.startsWith('data:image') || restaurant.logo.startsWith('http')) ? (
-              <img src={restaurant.logo} alt="Logo" className="w-full h-full object-cover" />
-            ) : (
-              restaurant.logo || '🍔'
-            )}
-          </div>
-          <div className="min-w-0">
-            <h1 className="font-bold text-sm leading-tight truncate max-w-[160px] sm:max-w-[220px]">{restaurant.name}</h1>
-            <div className="flex items-center gap-1">
-              <span className={`inline-block w-1.5 h-1.5 rounded-full ${isOpen ? 'bg-green-300' : 'bg-red-300'}`}></span>
-              <span className="text-[10px] opacity-80">{isOpen ? 'Open' : 'Closed'}</span>
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg overflow-hidden shadow-sm ring-1 ring-white/10">
+              {restaurant.logo && (restaurant.logo.startsWith('data:image') || restaurant.logo.startsWith('http')) ? (
+                <img src={restaurant.logo} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xl">{restaurant.logo || '🍔'}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm leading-tight truncate max-w-[140px] sm:max-w-[200px]" style={{ color: primaryTextColor }}>{restaurant.name}</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400 shadow-sm shadow-green-300/50' : 'bg-red-400 shadow-sm shadow-red-300/50'}`} />
+                <span className="text-[11px] font-medium opacity-90" style={{ color: primaryTextColor }}>{isOpen ? 'Open' : 'Closed'}</span>
+                <span className="text-[10px] opacity-50 ml-1" style={{ color: primaryTextColor }}>·</span>
+                <span className="text-[10px] opacity-70 hidden sm:inline" style={{ color: primaryTextColor }}>{restaurant.phone || ''}</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <NotificationBell pendingCount={pendingCount} navigateTo={`${base}/orders`} />
-          <button
-            onClick={toggleOpen}
-            className={`p-2 rounded-lg transition-colors ${isOpen ? 'hover:bg-white/10' : 'bg-white/20 hover:bg-white/30'}`}
-            title={isOpen ? 'Close Store' : 'Open Store'}
-          >
-            {isOpen ? <Power size={18} /> : <PowerOff size={18} />}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            title="Logout"
-          >
-            <LogOut size={18} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <NotificationBell pendingCount={pendingCount} navigateTo={`${base}/orders`} />
+            <button
+              onClick={toggleOpen}
+              className={`p-2 rounded-xl transition-all duration-200 ${
+                isOpen
+                  ? 'bg-white/10 hover:bg-white/20 active:scale-95'
+                  : 'bg-white/20 hover:bg-white/30 active:scale-95'
+              }`}
+              title={isOpen ? 'Close Store' : 'Open Store'}
+            >
+              {isOpen
+                ? <Power size={17} className="text-green-300" />
+                : <PowerOff size={17} className="text-red-300" />
+              }
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-xl hover:bg-white/10 active:scale-95 transition-all duration-200"
+              title="Logout"
+            >
+              <LogOut size={17} style={{ color: primaryTextColor }} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -110,7 +121,7 @@ const OwnerLayout = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 safe-bottom max-w-lg mx-auto">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200/80 safe-bottom max-w-lg mx-auto">
         <div className="flex items-center justify-around h-16">
           {navItems.map(item => (
             <NavLink
@@ -128,7 +139,6 @@ const OwnerLayout = () => {
 
       <InstallPrompt />
 
-      {/* New Order Popup Alerts */}
       {pendingAlerts.map(alert => (
         <NewOrderPopup key={alert.orderId} alert={alert} onDismiss={dismissAlert} />
       ))}

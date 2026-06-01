@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Store, Palette, Truck, ShoppingBag, Save, Upload, X, Lock, Power, PowerOff, Trash2, QrCode, Download, Phone, MapPin, Clock, Copy, Eye, EyeOff } from 'lucide-react';
+import { Store, Palette, Truck, ShoppingBag, Save, Upload, X, Lock, Power, PowerOff, Trash2, QrCode, Download, Phone, MapPin, Clock, Copy, Eye, EyeOff, Type } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useOwner } from '../../context/OwnerContext';
 import { ownerApi } from '../../utils/ownerApi';
@@ -21,6 +21,8 @@ const OwnerSettings = () => {
     address: r.address || '',
     primaryColor: r.primary_color || '#FF6B35',
     secondaryColor: r.secondary_color || '#FFFFFF',
+    primaryTextColor: r.primary_text_color || '#FFFFFF',
+    secondaryTextColor: r.secondary_text_color || '#374151',
     logo: r.logo || '',
     deliveryAvailable: r.delivery_available !== false,
     pickupAvailable: r.pickup_available !== false,
@@ -46,6 +48,9 @@ const OwnerSettings = () => {
   };
 
   const primaryColor = form.primaryColor || '#FF6B35';
+  const primaryTextColor = form.primaryTextColor || '#FFFFFF';
+  const secondaryColor = form.secondaryColor || '#FFFFFF';
+  const secondaryTextColor = form.secondaryTextColor || '#374151';
 
   const customerUrl = (() => {
     if (DOMAIN && restaurant.slug) return `https://${restaurant.slug}.${DOMAIN}`;
@@ -74,12 +79,31 @@ const OwnerSettings = () => {
   const sectionHeaderClasses = "flex items-center gap-2.5 px-5 py-4 border-b border-gray-50";
   const sectionBodyClasses = "px-5 py-4 space-y-4";
   const labelClasses = "text-xs font-medium text-gray-500 mb-1.5 block";
-  const inputClasses = "w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none transition-colors focus:bg-white focus:border-[#FF6B35] focus:ring-2 focus:ring-orange-100";
-  const saveBtnClasses = "w-full py-2.5 bg-[#FF6B35] text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all hover:bg-[#e55a2b]";
+  const inputClasses = "w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none transition-all focus:bg-white focus:border-[#FF6B35] focus:ring-2 focus:ring-orange-100";
+  const saveBtnClasses = "w-full py-2.5 bg-gradient-to-r from-[#FF6B35] to-[#e55a2b] text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all hover:shadow-md hover:shadow-orange-200";
+
+  const ColorField = ({ label, value, onChange, textColor, onTextColorChange }) => (
+    <div className="space-y-2">
+      <label className={labelClasses}>{label}</label>
+      <div className="flex gap-2">
+        <input type="color" value={value} onChange={(e) => onChange(e.target.value)}
+          className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
+        <input type="text" value={value} onChange={(e) => onChange(e.target.value)}
+          className="flex-1 px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none uppercase font-mono focus:bg-white focus:border-[#FF6B35]" />
+      </div>
+      <div className="flex gap-2 items-center">
+        <Type size={14} className="text-gray-400 flex-shrink-0" />
+        <input type="color" value={textColor} onChange={(e) => onTextColorChange(e.target.value)}
+          className="w-7 h-7 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
+        <input type="text" value={textColor} onChange={(e) => onTextColorChange(e.target.value)}
+          className="flex-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-[11px] outline-none uppercase font-mono focus:bg-white focus:border-[#FF6B35]" />
+        <span className="text-[10px] text-gray-400 font-medium flex-shrink-0">Text</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-5 pb-6">
-      {/* Header */}
       <div className="px-1">
         <h1 className="text-xl font-bold text-gray-900">Settings</h1>
         <p className="text-sm text-gray-400 mt-0.5">Manage your restaurant</p>
@@ -88,7 +112,7 @@ const OwnerSettings = () => {
       {/* Restaurant Profile */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <Store size={16} className="text-[#FF6B35]" />
           </div>
           <h2 className="text-sm font-bold text-gray-800">Restaurant Profile</h2>
@@ -135,17 +159,16 @@ const OwnerSettings = () => {
         </div>
       </div>
 
-      {/* QR Codes (combined) */}
+      {/* QR Codes */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <QrCode size={16} className="text-[#FF6B35]" />
           </div>
           <h2 className="text-sm font-bold text-gray-800">QR Codes</h2>
         </div>
         <div className="px-5 py-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Owner QR */}
             <div className="bg-gray-50 rounded-xl p-4 text-center space-y-3">
               <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Owner Panel</p>
               <div className="flex justify-center">
@@ -158,7 +181,6 @@ const OwnerSettings = () => {
               <div className="owner-qr hidden"><QRCodeSVG value={OWNER_URL} size={200} level="M" /></div>
             </div>
 
-            {/* Customer QR */}
             <div className="bg-gray-50 rounded-xl p-4 text-center space-y-3">
               <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Customer Menu</p>
               <div className="flex justify-center">
@@ -177,31 +199,27 @@ const OwnerSettings = () => {
       {/* Branding */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <Palette size={16} className="text-[#FF6B35]" />
           </div>
           <h2 className="text-sm font-bold text-gray-800">Branding</h2>
         </div>
         <div className={sectionBodyClasses}>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 min-w-0">
-              <label className={labelClasses}>Primary Color</label>
-              <div className="flex gap-2">
-                <input type="color" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
-                <input type="text" value={form.primaryColor} onChange={(e) => setForm({ ...form, primaryColor: e.target.value })}
-                  className="flex-1 px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none uppercase focus:bg-white focus:border-[#FF6B35]" />
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <label className={labelClasses}>Secondary Color</label>
-              <div className="flex gap-2">
-                <input type="color" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })}
-                  className="w-10 h-9 rounded-lg border-0 cursor-pointer p-0.5 flex-shrink-0" />
-                <input type="text" value={form.secondaryColor} onChange={(e) => setForm({ ...form, secondaryColor: e.target.value })}
-                  className="flex-1 px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none uppercase focus:bg-white focus:border-[#FF6B35]" />
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ColorField
+              label="Primary Color"
+              value={form.primaryColor}
+              onChange={(val) => setForm({ ...form, primaryColor: val })}
+              textColor={form.primaryTextColor}
+              onTextColorChange={(val) => setForm({ ...form, primaryTextColor: val })}
+            />
+            <ColorField
+              label="Secondary Color"
+              value={form.secondaryColor}
+              onChange={(val) => setForm({ ...form, secondaryColor: val })}
+              textColor={form.secondaryTextColor}
+              onTextColorChange={(val) => setForm({ ...form, secondaryTextColor: val })}
+            />
           </div>
 
           {/* Logo */}
@@ -235,24 +253,30 @@ const OwnerSettings = () => {
             {uploadingLogo && <p className="text-xs text-gray-400 mt-1.5">Uploading...</p>}
           </div>
 
-          {/* Preview Toggle */}
+          {/* Preview */}
           <button onClick={() => setShowBrandPreview(!showBrandPreview)}
             className="w-full py-2.5 bg-gray-50 rounded-xl text-xs font-medium text-gray-600 flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
             {showBrandPreview ? <EyeOff size={14} /> : <Eye size={14} />}
             {showBrandPreview ? 'Hide Preview' : 'Show Preview'}
           </button>
           {showBrandPreview && (
-            <div className="rounded-xl p-4 border-2" style={{ borderColor: primaryColor + '30', backgroundColor: primaryColor + '08' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl overflow-hidden flex-shrink-0" style={{ backgroundColor: primaryColor + '15' }}>
-                  {form.logo && (form.logo.startsWith('data:') || form.logo.startsWith('http') || form.logo.startsWith('/uploads')) ? (
-                    <img src={form.logo} alt="Logo" className="w-full h-full object-cover" />
-                  ) : (form.logo || '🍔')}
+            <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: primaryColor + '30' }}>
+              <div className="p-4" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl overflow-hidden flex-shrink-0 shadow-sm">
+                    {form.logo && (form.logo.startsWith('data:') || form.logo.startsWith('http') || form.logo.startsWith('/uploads')) ? (
+                      <img src={form.logo} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (form.logo || '🍔')}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm" style={{ color: primaryTextColor }}>{form.name || 'Restaurant'}</p>
+                    <p className="text-xs mt-0.5" style={{ color: primaryTextColor + 'cc' }}>{form.address || 'Address'}</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="font-bold text-sm" style={{ color: primaryColor }}>{form.name || 'Restaurant'}</p>
-                  <p className="text-xs text-gray-400 truncate">{form.address || 'Address'}</p>
-                </div>
+              </div>
+              <div className="p-4 space-y-2" style={{ backgroundColor: secondaryColor }}>
+                <p className="text-xs font-medium" style={{ color: secondaryTextColor }}>Body text example</p>
+                <p className="text-[11px]" style={{ color: secondaryTextColor + 'cc' }}>This is how your text colors will look in the app.</p>
               </div>
             </div>
           )}
@@ -266,10 +290,10 @@ const OwnerSettings = () => {
       {/* Hours & Delivery */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <Clock size={16} className="text-[#FF6B35]" />
           </div>
-          <h2 className="text-sm font-bold text-gray-800">Hours & Delivery</h2>
+          <h2 className="text-sm font-bold text-gray-800">Hours &amp; Delivery</h2>
         </div>
         <div className={sectionBodyClasses}>
           <div className="grid grid-cols-2 gap-3">
@@ -316,7 +340,7 @@ const OwnerSettings = () => {
       {/* Order Settings */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <ShoppingBag size={16} className="text-[#FF6B35]" />
           </div>
           <h2 className="text-sm font-bold text-gray-800">Order Settings</h2>
@@ -339,7 +363,7 @@ const OwnerSettings = () => {
       {/* Actions */}
       <div className={sectionClasses}>
         <div className={sectionHeaderClasses}>
-          <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
             <Lock size={16} className="text-[#FF6B35]" />
           </div>
           <h2 className="text-sm font-bold text-gray-800">Actions</h2>
