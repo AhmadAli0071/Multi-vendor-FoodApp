@@ -1,4 +1,5 @@
 import webpush from 'web-push';
+import PushSubscription from '../models/PushSubscription.js';
 
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BMmVGxP6aL712oC-R3eHljkQMjq6YR-juomw8w1CYe1JIUwTMSvFKOXoH4TOmceyfhrkvEyoDwNI3xeX0iq1d0A';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || 'cDKjXYM3LsZHWVN-Am4VFgeyYfYK9uQsIQbt_56Uy24';
@@ -20,7 +21,9 @@ export async function sendPush(subscription, title, body, data = {}) {
     return true;
   } catch (err) {
     if (err.statusCode === 410 || err.statusCode === 404) {
-      console.log('Push subscription expired/gone — should remove');
+      if (subscription?.endpoint) {
+        PushSubscription.deleteOne({ endpoint: subscription.endpoint }).catch(() => {});
+      }
       return false;
     }
     console.error('Push send error:', err.message);

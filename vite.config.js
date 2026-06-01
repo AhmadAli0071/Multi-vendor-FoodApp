@@ -18,6 +18,18 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true
       },
+      '/sw-admin.js': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/sw-owner.js': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/sw-customer.js': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
       '/manifest.json': {
         target: 'http://localhost:5000',
         changeOrigin: true

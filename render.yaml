@@ -21,6 +21,10 @@ services:
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
         value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
 
   - type: web
     name: foodapp-admin
@@ -44,6 +48,10 @@ services:
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
         value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
 
   - type: web
     name: foodapp-owner
@@ -67,3 +75,7 @@ services:
         value: https://foodapp-a0t0.onrender.com
       - key: CORS_ORIGINS
         value: "https://foodapp-a0t0.onrender.com,https://foodapp-admin-f13g.onrender.com,https://foodapp-owner.onrender.com"
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
